@@ -1,0 +1,2657 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Copiador de códigos (5 botones)</title>
+  <style>
+    :root{
+      --bg1:#4a148c;
+      --bg2:#00838f;
+      --card:#ffffff;
+      --text:#222;
+      --muted:#6b7280;
+      --btn:#0f766e;
+      --btnHover:#115e59;
+      --ok:#16a34a;
+      --err:#dc2626;
+      --border:#e5e7eb;
+    }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      background: linear-gradient(135deg,var(--bg1),var(--bg2));
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      color:var(--text);
+    }
+    .card{
+      width:min(860px, 100%);
+      background:var(--card);
+      border-radius:18px;
+      box-shadow:0 18px 45px rgba(0,0,0,.25);
+      padding:20px;
+      border:1px solid rgba(255,255,255,.2);
+    }
+    h1{
+      margin:0 0 6px;
+      font-size:18px;
+      text-align:center;
+    }
+    .sub{
+      margin:0 0 16px;
+      text-align:center;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.35;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap:10px;
+    }
+    @media (max-width: 780px){
+      .grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 420px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+    button{
+      appearance:none;
+      border:none;
+      border-radius:14px;
+      padding:14px 12px;
+      font-weight:800;
+      cursor:pointer;
+      background:var(--btn);
+      color:white;
+      transition: transform .04s ease, background .15s ease;
+      box-shadow: 0 10px 20px rgba(15,118,110,.25);
+    }
+    button:hover{ background:var(--btnHover); }
+    button:active{ transform: translateY(1px); }
+    .status{
+      margin-top:14px;
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:12px;
+      font-size:13px;
+      line-height:1.35;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      background:#f9fafb;
+    }
+    .badge{
+      font-weight:800;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      color:#111827;
+      background:#e5e7eb;
+      white-space:nowrap;
+    }
+    .ok{ background: rgba(22,163,74,.15); color: var(--ok); }
+    .err{ background: rgba(220,38,38,.15); color: var(--err); }
+
+    /* Textareas ocultas (no visibles) */
+    .hidden-store{
+      position:absolute;
+      left:-9999px;
+      top:-9999px;
+      width:1px;
+      height:1px;
+      opacity:0;
+      pointer-events:none;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="card">
+    <h1>Copiar códigos</h1>
+    <p class="sub">
+      Presiona un botón y el código se copiará al portapapeles (sin mostrarse).
+      Luego solo pega donde lo necesites.
+    </p>
+
+    <section class="grid">
+      <button type="button" onclick="copiar('codigo1', 'Código 1')">1- 📋 Código Firma Digital Script</button>
+      <button type="button" onclick="copiar('codigo2', 'Código 2')">2- 📋 CCódigo Firma Digital Interface</button>
+      <button type="button" onclick="copiar('codigo3', 'Código 3')">3- 📋 Código Formulario Matricula</button>
+      <button type="button" onclick="copiar('codigo4', 'Código 4')">4- 📋 Código FIRMAS. GFPI-PL-001</button>
+      <button type="button" onclick="copiar('codigo5', 'Código 5')">5- 📋 Código Carga de Documentos Firmados</button> 
+    </section>
+
+    <div class="status" aria-live="polite">
+      <div id="msg">Listo. Elige un botón para copiar.</div>
+      <div id="badge" class="badge">Esperando…</div>
+    </div>
+
+    <!-- ======= ALMACÉN OCULTO DE CÓDIGO =======
+         Pega aquí tus 5 bloques completos. No se ven en pantalla. -->
+    <textarea id="codigo1" class="hidden-store">
+/* Pega aquí el código 1 (puede ser larguísimo) */
+let CONFIG_CACHE = null;
+
+
+
+/***************************************************************
+ *
+ * 🔐 CONFIG DINÁMICA DESDE GOOGLE SHEETS EXTERNO
+ *
+ ***************************************************************/
+
+const ID_CONFIG_SHEET = "1moyimPG2k5Dk7osKnkohlti28EiAjIuZqmG55XQs1AY";//PEGA_AQUI_ID_DEL_SHEET_CONFIG
+const NOMBRE_HOJA_CONFIG = "CONFIG";
+
+function cargarConfigDesdeSheet_() {
+
+  if (CONFIG_CACHE) {
+    return CONFIG_CACHE;
+  }
+
+  const ss = SpreadsheetApp.openById(ID_CONFIG_SHEET);
+  const hoja = ss.getSheetByName(NOMBRE_HOJA_CONFIG);
+
+  if (!hoja) {
+    throw new Error('No existe la hoja "' + NOMBRE_HOJA_CONFIG + '"');
+  }
+
+  const lastRow = hoja.getLastRow();
+  if (lastRow < 2) {
+    throw new Error("La hoja CONFIG no tiene datos.");
+  }
+
+  const valores = hoja.getRange(2, 1, lastRow - 1, 2).getValues();
+  const cfg = {};
+
+  valores.forEach(r => {
+    const clave = String(r[0] || "").trim();
+    const valor = String(r[1] || "").trim();
+    if (clave) cfg[clave] = valor;
+  });
+
+  CONFIG_CACHE = cfg; // 👈 Guardar en memoria
+
+  return CONFIG_CACHE;
+}
+
+
+
+
+
+/**
+ * =====================================================
+ * CONFIGURACIÓN GENERAL
+ * =====================================================
+ */
+
+
+
+/**
+ * =====================================================
+ * WEB APP - ENTRADA
+ * - Sin token: flujo normal (Aprendiz -> Acudiente o generar link)
+ * - Con token: flujo acudiente (solo firma acudiente y finaliza)
+ * =====================================================
+ */
+function doGet(e) {
+
+  const CONFIG = cargarConfigDesdeSheet_();  // 🔐 Cargar hoja CONFIG
+
+  const token = (e && e.parameter && e.parameter.token)
+    ? String(e.parameter.token)
+    : "";
+
+  const template = HtmlService.createTemplateFromFile("firma");
+
+  template.token = token;
+  template.LINK_FORMULARIO = CONFIG.LINK_FORMULARIO; // 👈 SOLO ESTE
+
+  return template.evaluate()
+    .setTitle("Matrículas 2026 - SENA CBI")
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+
+/**
+ * =====================================================
+ * UTILIDADES
+ * =====================================================
+ */
+function normalizarNombre_(s) {
+  return String(s || "")
+    .toUpperCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, "_");
+}
+
+function obtenerHojaControl_() {
+
+  const CONFIG = cargarConfigDesdeSheet_();
+
+  if (!CONFIG.ID_CONTROL_FIRMAS) {
+    throw new Error("CONFIG: Falta ID_CONTROL_FIRMAS");
+  }
+
+  if (!CONFIG.NOMBRE_HOJA_CONTROL) {
+    throw new Error("CONFIG: Falta NOMBRE_HOJA_CONTROL");
+  }
+
+  const ss = SpreadsheetApp.openById(CONFIG.ID_CONTROL_FIRMAS);
+  const hoja = ss.getSheetByName(CONFIG.NOMBRE_HOJA_CONTROL);
+
+  if (!hoja) throw new Error("No existe la hoja: " + CONFIG.NOMBRE_HOJA_CONTROL);
+
+  return hoja;
+}
+
+
+function generarIdProceso_() {
+  return Utilities.getUuid();
+}
+
+function generarTokenSeguro_() {
+  const random = Utilities.getUuid() + Utilities.getUuid() + new Date().getTime();
+  const hash = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, random);
+  return hash.map(b => (('0' + (b & 0xFF).toString(16)).slice(-2))).join('');
+}
+
+/**
+ * =====================================================
+ * GUARDAR PNG EN DRIVE
+ * =====================================================
+ */
+function guardarFirmaDrive_(dataUrl, apellidos, nombres, documento, tipoFirma) {
+  const CONFIG = cargarConfigDesdeSheet_();
+//ID_CARPETA_FIRMAS
+if (!CONFIG.CARPETA_FIRMAS) {
+  throw new Error("CONFIG: Falta CARPETA_FIRMAS");
+}
+
+const folder = DriveApp.getFolderById(CONFIG.CARPETA_FIRMAS);
+
+
+  const nombreArchivo =
+    normalizarNombre_(apellidos) + "_" +
+    normalizarNombre_(nombres) + "_" +
+    normalizarNombre_(documento) + "_" +
+    normalizarNombre_(tipoFirma) + ".png";
+
+  const base64 = String(dataUrl || "").split(",")[1];
+  if (!base64) throw new Error("Firma inválida (dataUrl vacío).");
+
+  const bytes = Utilities.base64Decode(base64);
+  const blob = Utilities.newBlob(bytes, "image/png", nombreArchivo);
+
+  folder.createFile(blob);
+
+  return { ok: true, fileName: nombreArchivo };
+}
+
+/**
+ * =====================================================
+ * CREAR PROCESO (SIEMPRE se crea al guardar firma del aprendiz)
+ * Estructura recomendada (A-L):
+ * A ID_PROCESO
+ * B DOCUMENTO_APRENDIZ
+ * C NOMBRE_APRENDIZ
+ * D CORREO_APRENDIZ
+ * E TOKEN
+ * F ESTADO_APRENDIZ (FIRMADO)
+ * G ESTADO_ACUDIENTE (PENDIENTE/FIRMADO)
+ * H LINK_TOKEN
+ * I FECHA_CREACION
+ * J FECHA_FIRMA_APRENDIZ
+ * K FECHA_FIRMA_ACUDIENTE
+ * L ESTADO_GENERAL (INICIADO/ESPERANDO_ACUDIENTE/COMPLETO)
+ * =====================================================
+ */
+function crearProcesoFirma(documentoAprendiz, nombreAprendiz, correoAprendiz) {
+  const hoja = obtenerHojaControl_();
+
+  const idProceso = generarIdProceso_();
+  const token = generarTokenSeguro_();
+
+  const ahora = new Date();
+  const link = ScriptApp.getService().getUrl() + "?token=" + token;
+
+  hoja.appendRow([
+    idProceso,
+    String(documentoAprendiz || "").trim(),
+    String(nombreAprendiz || "").trim(),
+    String(correoAprendiz || "").trim(),
+    token,
+    "FIRMADO",              // aprendiz
+    "PENDIENTE",            // acudiente
+    link,
+    ahora,                  // creación
+    ahora,                  // firma aprendiz
+    "",                     // firma acudiente
+    "ESPERANDO_ACUDIENTE"   // estado general
+  ]);
+
+  return { ok: true, token: token, link: link };
+}
+
+/**
+ * =====================================================
+ * VALIDAR TOKEN
+ * =====================================================
+ */
+function validarToken_(token) {
+  const hoja = obtenerHojaControl_();
+  const datos = hoja.getDataRange().getValues();
+  const t = String(token || "").trim();
+  if (!t) return { valido: false, motivo: "Token vacío" };
+
+  for (let i = 1; i < datos.length; i++) {
+    const tokenFila = String(datos[i][4] || "").trim(); // col E
+    if (tokenFila === t) {
+      const estadoGeneral = String(datos[i][11] || "").trim(); // col L
+      if (estadoGeneral === "COMPLETO") {
+        return { valido: false, motivo: "Proceso ya finalizado" };
+      }
+
+      return {
+        valido: true,
+        fila: i + 1,
+        correoAprendiz: String(datos[i][3] || "").trim(), // col D
+        documentoAprendiz: String(datos[i][1] || "").trim(), // col B
+        nombreAprendiz: String(datos[i][2] || "").trim(), // col C
+        linkToken: String(datos[i][7] || "").trim() // col H
+      };
+    }
+  }
+
+  return { valido: false, motivo: "Token inválido" };
+}
+
+/**
+ * =====================================================
+ * REGISTRAR FIRMA ACUDIENTE (vale para modo token o mismo equipo)
+ * - Guarda PNG del acudiente
+ * - Actualiza CONTROL_FIRMAS a COMPLETO
+ * - Envía correo al aprendiz con link formulario
+ * =====================================================
+ */
+function registrarFirmaAcudientePorToken(token, dataUrl, apellidos, nombres, documentoAcudiente) {
+  const hoja = obtenerHojaControl_();
+  const v = validarToken_(token);
+
+  if (!v.valido) throw new Error(v.motivo);
+
+  // Guardar PNG acudiente
+  guardarFirmaDrive_(dataUrl, apellidos, nombres, documentoAcudiente, "ACUDIENTE");
+
+  const ahora = new Date();
+
+  // Col G (7): estado acudiente
+  hoja.getRange(v.fila, 7).setValue("FIRMADO");
+
+  // Col K (11): fecha firma acudiente
+  hoja.getRange(v.fila, 11).setValue(ahora);
+
+  // Col L (12): estado general
+  hoja.getRange(v.fila, 12).setValue("COMPLETO");
+
+  // (opcional) Col I/J ya están; podemos actualizar creación/actualización si quieres
+
+  // Enviar correo al aprendiz
+  enviarCorreoFormulario_(v.correoAprendiz);
+
+  return { ok: true };
+}
+
+/**
+ * =====================================================
+ * GUARDAR FIRMA APRENDIZ (Y CREAR PROCESO)
+ * - Guarda PNG aprendiz
+ * - Crea fila CONTROL_FIRMAS (token + link)
+ * - Devuelve token y link para usar en el front
+ * =====================================================
+ */
+function guardarFirmaAprendizYCrearProceso(dataUrl, apellidos, nombres, documentoAprendiz, correoAprendiz) {
+
+  // Guardar PNG aprendiz
+  const r = guardarFirmaDrive_(dataUrl, apellidos, nombres, documentoAprendiz, "APRENDIZ");
+
+  // Crear proceso
+  const nombreCompleto = String(nombres || "").trim() + " " + String(apellidos || "").trim();
+  const p = crearProcesoFirma(documentoAprendiz, nombreCompleto, correoAprendiz);
+
+  return {
+    ok: true,
+    fileName: r.fileName,
+    token: p.token,
+    link: p.link
+  };
+}
+
+/**
+ * =====================================================
+ * ENVIAR LINK DEL TOKEN AL ACUDIENTE (opción por correo)
+ * =====================================================
+ */
+function enviarLinkAcudientePorCorreo(correoAcudiente, linkToken, nombreAprendiz, documentoAprendiz) {
+
+  const asunto = "Firma requerida - Matrícula SENA 2026";
+  const mensaje =
+`Hola 
+
+El aprendiz ${nombreAprendiz} (Doc. ${documentoAprendiz}) requiere tu firma para continuar el proceso de matrícula.
+
+Por favor abre este enlace seguro y firma:
+${linkToken}
+
+Gracias por tu apoyo.`;
+
+  GmailApp.sendEmail(String(correoAcudiente || "").trim(), asunto, mensaje);
+  return { ok: true };
+}
+
+/**
+ * =====================================================
+ * CORREO AL APRENDIZ CON LINK DEL FORMULARIO
+ * =====================================================
+ */
+function enviarCorreoFormulario_(correoAprendiz) {
+
+  const CONFIG = cargarConfigDesdeSheet_();
+
+  if (!CONFIG.LINK_FORMULARIO) {
+    throw new Error("CONFIG: Falta LINK_FORMULARIO");
+  }
+
+  const asunto = "Continúa tu proceso de matrícula SENA 2026";
+
+  const mensaje =
+
+`Hola 
+
+Tus firmas fueron registradas correctamente.
+
+✅ Ya puedes continuar con el formulario oficial de matrícula aquí:
+${CONFIG.LINK_FORMULARIO}
+
+⚠️ Si ya diligenciaste el formulario, puedes omitir este mensaje.
+
+Recomendación:
+• Para cargar documentos es más cómodo hacerlo desde un computador.
+• También puedes hacerlo desde tu celular si ya tienes los PDF listos.
+
+Bienvenido a este nuevo camino SENA.
+Cada paso que das construye tu futuro. 
+
+Equipo SENA CBI`;
+
+  GmailApp.sendEmail(String(correoAprendiz || "").trim(), asunto, mensaje);
+}
+
+    </textarea>
+
+    <textarea id="codigo2" class="hidden-store">
+/* Pega aquí el código 2 */
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Matrículas 2026 - SENA CBI</title>
+
+<style>
+  :root{
+    --bg1:#4a148c;
+    --bg2:#00838f;
+    --card:#ffffff;
+    --muted:#f4f6f8;
+    --warn:#fff3cd;
+    --warnBorder:#ffeeba;
+    --primary:#00838f;
+    --success:#1b5e20;
+    --danger:#c62828;
+    --text:#222;
+  }
+
+  body{
+    margin:0;
+    font-family:'Segoe UI',sans-serif;
+    background:linear-gradient(135deg,var(--bg1),var(--bg2));
+    color:var(--text);
+  }
+
+  .wrapper{
+    max-width: 820px;
+    margin:auto;
+    padding:16px;
+  }
+
+  .card{
+    background:var(--card);
+    border-radius:16px;
+    padding:18px;
+    box-shadow:0 15px 35px rgba(0,0,0,.25);
+  }
+
+  .logo{
+    width:120px;
+    display:block;
+    margin: 2px auto 8px;
+  }
+
+  h1{
+    text-align:center;
+    font-size:20px;
+    margin: 6px 0 6px;
+  }
+
+  .subtitulo{
+    text-align:center;
+    color:#555;
+    margin-bottom: 12px;
+    font-size: 14px;
+  }
+
+  .info{
+    background:var(--muted);
+    padding:12px;
+    border-radius:12px;
+    margin-bottom:12px;
+    font-size:14px;
+    line-height:1.35;
+  }
+
+  .docs{
+    background: var(--warn);
+    border:1px solid var(--warnBorder);
+  }
+
+  .checklist{
+    margin-top:10px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+
+  .check-item{
+    display:grid;
+    grid-template-columns: 24px 1fr;
+    column-gap:10px;
+    align-items:start;
+    font-size:14px;
+    line-height:1.35;
+  }
+
+  .check-item input{
+    margin-top:3px;
+    transform:scale(1.1);
+  }
+
+  .link-adres{
+    color:#0d47a1;
+    font-weight:700;
+    text-decoration:underline;
+  }
+
+  .link-adres:hover{ text-decoration:none; }
+
+  .paso-indicador{
+    text-align:center;
+    font-weight:800;
+    background:#e3f2fd;
+    padding:10px;
+    border-radius:12px;
+    margin: 12px 0;
+  }
+
+  .row{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+
+  .row > .col{
+    flex:1 1 240px;
+  }
+
+  input, select{
+    width:100%;
+    padding:12px;
+    border-radius:10px;
+    border:1px solid #ccc;
+    font-size:16px;
+    box-sizing:border-box;
+  }
+
+  .label{
+    font-size:13px;
+    color:#444;
+    margin: 10px 0 6px;
+    font-weight:700;
+  }
+
+  canvas{
+    border:2px dashed #999;
+    border-radius:12px;
+    width:100%;
+    height:220px;       /* ✅ conservamos tamaño similar al anterior */
+    background:#fff;
+    touch-action:none;
+  }
+
+  @media (max-width:600px){
+    .wrapper{ padding:12px; }
+    .card{ padding:14px; }
+    canvas{ height:260px; } /* ✅ más cómodo en móvil */
+  }
+
+  .btn{
+    width:100%;
+    padding:14px;
+    margin-top:12px;
+    border:none;
+    border-radius:12px;
+    font-size:16px;
+    font-weight:800;
+    cursor:pointer;
+  }
+  .btn-primary{ background:var(--primary); color:#fff; }
+  .btn-secondary{ background:#ccc; }
+  .btn-success{ background:var(--success); color:#fff; }
+  .btn-danger{ background:var(--danger); color:#fff; }
+
+  #msg{
+    margin-top:12px;
+    font-weight:800;
+    text-align:center;
+    white-space:pre-line;
+    line-height:1.35;
+  }
+
+  .hide{ display:none !important; }
+
+  .box-share{
+    margin-top:12px;
+    padding:12px;
+    border-radius:12px;
+    background:#eef7ff;
+    border:1px solid #cfe6ff;
+  }
+
+  .chip{
+    display:inline-block;
+    padding:6px 10px;
+    border-radius:999px;
+    background:#e8f5e9;
+    color:#1b5e20;
+    font-weight:800;
+    font-size:12px;
+    margin-bottom:8px;
+  }
+
+  .small{
+    font-size:13px;
+    color:#444;
+    line-height:1.35;
+  }
+
+  a.btn-link{
+    display:block;
+    text-align:center;
+    text-decoration:none;
+    color:#fff;
+  }
+
+  .radio-group {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.radio-item {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  align-items: start;
+  column-gap: 10px;
+  font-size: 14px;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.radio-item input {
+  margin-top: 3px;
+  transform: scale(1.1);
+}
+
+
+.footer-legal{
+  margin-top:18px;
+  font-size:12px;
+  color:#666;
+  text-align:center;
+  line-height:1.5;
+}
+
+</style>
+</head>
+
+<body>
+<div class="wrapper">
+  <div class="card">
+
+    <img class="logo" src="https://www.sena.edu.co/Style%20Library/alayout/images/logoSena.png" alt="SENA" />
+    <h1>Matrículas 2026</h1>
+    <div class="subtitulo">Articulación con la Media – Palmira CBI</div>
+
+    <!-- Info breve (se mantiene) -->
+    <div class="info" id="infoGeneral">
+      <strong>Antes de diligenciar el formulario:</strong><br><br>
+      1️⃣ Firma del <b>Aprendiz</b> y del <b>Acudiente</b>.<br>
+      2️⃣ Guarda cada firma.<br>
+      3️⃣ Al finalizar, se habilita el botón para continuar al formulario.
+    </div>
+
+    <!-- Checklist documentos (se mantiene) -->
+    <div class="info docs" id="boxDocumentos">
+      <strong>📌 IMPORTANTE:</strong><br><br>
+      Antes de continuar, debe tener en formato digital (PDF):<br>
+      <b>SELECCIONE PARA CONFIRMAR:</b>
+
+      <div class="checklist">
+        <label class="check-item">
+          <input type="checkbox" class="doc-check">
+          <span>Documento de identidad del aprendiz (ambos lados)</span>
+        </label>
+
+        <label class="check-item">
+          <input type="checkbox" class="doc-check">
+          <span>Documento de identidad del acudiente (ambos lados)</span>
+        </label>
+
+        <label class="check-item">
+          <input type="checkbox" class="doc-check">
+          <span>
+            Certificado ADRES
+            (<a href="https://www.adres.gov.co/consulte-su-eps" target="_blank" class="link-adres">Descargar aquí</a>)
+          </span>
+        </label>
+
+        <label class="check-item">
+          <input type="checkbox" class="doc-check">
+          <span>Registro civil de nacimiento</span>
+        </label>
+
+        <label class="check-item">
+          <input type="checkbox" class="doc-check">
+          <span>Documento legal de custodia (si el acudiente no es padre o madre). De lo contrario seleccionar y <b>OMITIR.</b></span>
+        </label>
+      </div>
+
+      <div class="small" style="margin-top:10px;">
+        ⚠️ Si no cuenta con estos documentos digitalizados, no podrá continuar con el proceso de matrícula.
+      </div>
+    </div>
+
+    <!-- Confirmación lectura de información -->
+<div class="info" id="boxConfirmacionLectura">
+  <label class="check-item">
+    <input type="checkbox" id="checkLectura">
+    <span>
+      Confirmo que ya leí y entendí la información a diligenciar en los formatos de compromiso del aprendiz,
+      tratamiento de datos de menor de edad y ficha de matrícula.
+    </span>
+  </label>
+</div>
+
+
+
+    <div class="paso-indicador" id="pasoTexto">Paso 1 de 2 – Firma del Aprendiz</div>
+
+    <!-- Pregunta “¿Acudiente presente?” (solo en modo normal, Paso 1) -->
+    <div class="info" id="boxPresencia">
+      <strong>¿El acudiente está presente para firmar ahora?</strong>
+      <div class="radio-group">
+
+  <label class="radio-item">
+    <input type="radio" name="presencia" value="SI" checked>
+    <span>Sí, firmará aquí mismo</span>
+  </label>
+
+  <label class="radio-item">
+    <input type="radio" name="presencia" value="NO">
+    <span>No, firmará desde su celular</span>
+  </label>
+
+</div>
+
+
+      <div class="small" style="margin-top:8px;">
+        Si seleccionas <b>NO</b>, después de la firma del aprendiz se generará un link seguro para enviarlo al acudiente (WhatsApp o correo).
+      </div>
+    </div>
+
+    <!-- Datos (arriba) -->
+    <div class="label" id="labelDatos">Datos del Aprendiz</div>
+    <div class="row">
+      <div class="col">
+        <input id="apellidos" placeholder="Apellidos" autocomplete="off" />
+      </div>
+      <div class="col">
+        <input id="nombres" placeholder="Nombres" autocomplete="off" />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <input
+          id="documento"
+          type="text"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          placeholder="Documento"
+          oninput="this.value=this.value.replace(/[^0-9]/g,'');"
+          autocomplete="off"
+        />
+      </div>
+      <div class="col" id="colCorreoAprendiz">
+        <input id="correoAprendiz" type="email" placeholder="Correo del aprendiz (obligatorio)" autocomplete="off" />
+      </div>
+    </div>
+
+    <!-- Canvas firma -->
+    <div class="label" id="labelFirma">Firma</div>
+    <canvas id="canvas"></canvas>
+
+    <!-- Botones -->
+    <button class="btn btn-secondary" type="button" onclick="limpiarFirma()">Limpiar firma</button>
+    <button class="btn btn-primary" type="button" onclick="guardarYContinuar()" id="btnGuardar">Guardar y continuar</button>
+
+    <!-- Módulo share (solo cuando NO está el acudiente y ya firmó el aprendiz) -->
+    <div class="box-share hide" id="boxShare">
+      <div class="chip">Link seguro generado</div>
+      <div class="small">
+        Copia este enlace y envíalo por WhatsApp al acudiente, o envíalo por correo.
+        <br><b>Cuando el acudiente firme</b>, el sistema enviará automáticamente al correo del aprendiz el enlace del formulario.
+      </div>
+
+      <div style="margin-top:10px;">
+        <input id="linkToken" readonly />
+      </div>
+
+      <button class="btn btn-secondary" type="button" onclick="copiarLink()">📋 Copiar link</button>
+      <button class="btn btn-primary" type="button" onclick="compartirWhatsApp()">💬 Compartir por WhatsApp</button>
+
+      <div class="label" style="margin-top:10px;">Correo del acudiente (opcional)</div>
+      <input id="correoAcudiente" type="email" placeholder="Correo del acudiente" autocomplete="off" />
+      <button class="btn btn-primary" type="button" onclick="enviarCorreoAcudiente()">✉️ Enviar link al correo del acudiente</button>
+    </div>
+
+    <div id="msg"></div>
+
+    <!-- Botón al formulario (solo cuando todo COMPLETO en modo normal) -->
+    <a href="<?= LINK_FORMULARIO ?>" 
+   target="_blank" 
+   id="btnFormulario" 
+   class="btn btn-success btn-link hide">
+
+      🚀 CONTINUAR AL FORMULARIO
+    </a>
+
+    <div class="footer-legal">
+  Al continuar con el formulario autorizo de manera libre, previa, expresa e informada el tratamiento de mis datos personales,
+  conforme a lo establecido en la Ley 1581 de 2012, con fines académicos, administrativos e institucionales.
+</div>
+
+
+
+  </div>
+</div>
+
+<script>
+  const TOKEN = "<?= token ?>"; // viene desde doGet
+</script>
+
+<script>
+  // ===============================
+  // ESTADO GENERAL
+  // ===============================
+  let modoToken = false;   // true si llegó con ?token=
+  let pasoActual = 1;      // 1 aprendiz, 2 acudiente
+  let tokenProceso = "";  // token creado al firmar aprendiz (para caso mismo equipo)
+  let linkProceso = "";
+
+  // ===============================
+  // CANVAS
+  // ===============================
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+
+  function ajustarCanvas(){
+    // Ajuste interno real del canvas para que no se “deforme” la firma
+    const ratio = window.devicePixelRatio || 1;
+    const w = canvas.offsetWidth;
+    const h = canvas.offsetHeight;
+
+    canvas.width = Math.floor(w * ratio);
+    canvas.height = Math.floor(h * ratio);
+
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+    ctx.lineWidth = 2;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = "#000";
+  }
+
+  window.addEventListener("load", () => {
+    ajustarCanvas();
+
+    // Modo token (solo acudiente)
+    if (TOKEN && TOKEN !== "null" && TOKEN.trim() !== "") {
+      modoToken = true;
+      pasoActual = 2;
+      document.getElementById("pasoTexto").textContent = "Firma del Acudiente (enlace seguro)";
+      document.getElementById("labelDatos").textContent = "Datos del Acudiente";
+      document.getElementById("colCorreoAprendiz").classList.add("hide"); // el acudiente no debe cambiar correo del aprendiz
+      document.getElementById("boxPresencia").classList.add("hide");      // no aplica
+      // Checklist se puede dejar visible, pero NO bloquea en modo token (regla en guardar)
+    } else {
+      // modo normal
+      document.getElementById("pasoTexto").textContent = "Paso 1 de 2 – Firma del Aprendiz";
+    }
+  });
+
+  window.addEventListener("resize", ajustarCanvas);
+
+  let drawing = false;
+  function pos(evt){
+    const rect = canvas.getBoundingClientRect();
+    const cx = (evt.touches ? evt.touches[0].clientX : evt.clientX) - rect.left;
+    const cy = (evt.touches ? evt.touches[0].clientY : evt.clientY) - rect.top;
+    return { x: cx, y: cy };
+  }
+
+  canvas.addEventListener("mousedown", e => {
+    drawing = true;
+    const p = pos(e);
+    ctx.beginPath();
+    ctx.moveTo(p.x, p.y);
+  });
+
+  canvas.addEventListener("mousemove", e => {
+    if (!drawing) return;
+    const p = pos(e);
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+  });
+
+  canvas.addEventListener("mouseup", () => drawing = false);
+  canvas.addEventListener("mouseleave", () => drawing = false);
+
+  canvas.addEventListener("touchstart", e => {
+    drawing = true;
+    const p = pos(e);
+    ctx.beginPath();
+    ctx.moveTo(p.x, p.y);
+  });
+
+  canvas.addEventListener("touchmove", e => {
+    e.preventDefault();
+    if (!drawing) return;
+    const p = pos(e);
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+  }, { passive:false });
+
+  canvas.addEventListener("touchend", () => drawing = false);
+
+  function limpiarFirma(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    document.getElementById("msg").textContent = "";
+  }
+
+  function canvasVacio(){
+    // chequeo simple: si hay algún pixel no transparente
+    const img = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    for (let i = 3; i < img.length; i += 4) {
+      if (img[i] !== 0) return false;
+    }
+    return true;
+  }
+
+  function documentosConfirmados(){
+    const checks = document.querySelectorAll(".doc-check");
+    for (const c of checks) {
+      if (!c.checked) return false;
+    }
+    return true;
+  }
+
+  function getPresencia(){
+    const el = document.querySelector('input[name="presencia"]:checked');
+    return el ? el.value : "SI";
+  }
+
+  function setMsg(t){ document.getElementById("msg").textContent = t; }
+
+  // ===============================
+  // FLUJO PRINCIPAL: GUARDAR Y CONTINUAR
+  // ===============================
+  function guardarYContinuar(){
+
+    // En modo normal bloqueamos si no confirmaron docs
+    /*if (!modoToken && !documentosConfirmados()) {
+  setMsg("⚠️ Debes confirmar que tienes los documentos digitalizados antes de continuar.");
+  return;
+}
+if (!modoToken && !documentosConfirmados()) {
+  alert("Debes confirmar que tienes los documentos digitalizados antes de continuar.");
+  return;
+}
+*/
+if (!modoToken && !documentosConfirmados()) {
+  setMsg("⚠️ Debes confirmar que tienes los documentos digitalizados antes de continuar.");
+  return;
+}
+
+if (!modoToken && !document.getElementById("checkLectura").checked) {
+  setMsg("⚠️ Debes confirmar que leíste y entendiste la información antes de continuar.");
+  return;
+}
+
+
+
+    const apellidos = document.getElementById("apellidos").value.trim();
+    const nombres = document.getElementById("nombres").value.trim();
+    const documento = document.getElementById("documento").value.trim();
+    const correoAprendiz = document.getElementById("correoAprendiz") ? document.getElementById("correoAprendiz").value.trim() : "";
+
+    if (!apellidos || !nombres || !documento) {
+      alert("Complete todos los campos.");
+      return;
+    }
+
+    // En modo normal, el correo del aprendiz es obligatorio desde el inicio (porque lo usaremos sí o sí)
+    if (!modoToken && !correoAprendiz) {
+      alert("El correo del aprendiz es obligatorio.");
+      return;
+    }
+
+    if (canvasVacio()) {
+      alert("Debe firmar antes de continuar.");
+      return;
+    }
+
+    const dataUrl = canvas.toDataURL("image/png");
+
+    // =========================
+    // MODO TOKEN: solo acudiente
+    // =========================
+    if (modoToken) {
+      setMsg("Guardando firma del acudiente...");
+
+      google.script.run
+        .withSuccessHandler(() => {
+          limpiarFirma();
+          setMsg("✅ Firma del acudiente registrada correctamente.\nSe envió el enlace del formulario al correo del aprendiz.");
+        })
+        .withFailureHandler(err => setMsg("Error: " + err.message))
+        .registrarFirmaAcudientePorToken(TOKEN, dataUrl, apellidos, nombres, documento);
+
+      return;
+    }
+
+    // =========================
+    // MODO NORMAL: Paso 1 o Paso 2
+    // =========================
+    if (pasoActual === 1) {
+      // Guardar aprendiz + crear proceso
+      setMsg("Guardando firma del aprendiz...");
+
+      google.script.run
+        .withSuccessHandler(res => {
+          tokenProceso = res.token;
+          linkProceso = res.link;
+
+          // paso 1 listo
+          limpiarFirma();
+
+          // Si acudiente NO está: mostramos módulo de link y detenemos el flujo aquí
+          if (getPresencia() === "NO") {
+            document.getElementById("boxShare").classList.remove("hide");
+            document.getElementById("linkToken").value = linkProceso;
+
+            setMsg(
+              "✅ Firma del aprendiz guardada.\n" +
+              "Ahora envía el link al acudiente para que firme.\n" +
+              "Cuando el acudiente firme, recibirás el enlace del formulario en tu correo."
+            );
+
+            // Bloqueamos cambios del aprendiz (para evitar confusiones)
+            bloquearDatos(true);
+            document.getElementById("btnGuardar").disabled = true;
+            document.getElementById("btnGuardar").style.opacity = "0.6";
+            document.getElementById("boxPresencia").classList.add("hide");
+            return;
+          }
+
+          // Si acudiente SÍ está: avanzamos a Paso 2
+          pasoActual = 2;
+          document.getElementById("pasoTexto").textContent = "Paso 2 de 2 – Firma del Acudiente";
+          document.getElementById("labelDatos").textContent = "Datos del Acudiente";
+
+          // Importante: limpiar campos para evitar que el acudiente firme con datos del aprendiz
+          limpiarCampos();
+
+          // Ocultamos caja de presencia para evitar que cambien después
+          document.getElementById("boxPresencia").classList.add("hide");
+
+          setMsg("✅ Firma del aprendiz guardada.\nAhora debe firmar el acudiente.");
+
+        })
+        .withFailureHandler(err => setMsg("Error: " + err.message))
+        .guardarFirmaAprendizYCrearProceso(dataUrl, apellidos, nombres, documento, correoAprendiz);
+
+      return;
+    }
+
+    // Paso 2: registrar firma acudiente usando el token del proceso creado en paso 1
+    if (!tokenProceso) {
+      alert("No se encontró el token del proceso. Vuelve a iniciar el flujo.");
+      return;
+    }
+
+    setMsg("Guardando firma del acudiente...");
+
+    google.script.run
+      .withSuccessHandler(() => {
+        limpiarFirma();
+        setMsg(
+          "✅ Firmas completadas correctamente.\n" +
+          "También recibirás el enlace del formulario en tu correo.\n" +
+          "Ya puedes continuar aquí mismo:"
+        );
+        document.getElementById("btnFormulario").classList.remove("hide");
+        // Bloquea para evitar re-guardados por error
+        document.getElementById("btnGuardar").disabled = true;
+        document.getElementById("btnGuardar").style.opacity = "0.6";
+      })
+      .withFailureHandler(err => setMsg("Error: " + err.message))
+      .registrarFirmaAcudientePorToken(tokenProceso, dataUrl, apellidos, nombres, documento);
+  }
+
+  function limpiarCampos(){
+    document.getElementById("apellidos").value = "";
+    document.getElementById("nombres").value = "";
+    document.getElementById("documento").value = "";
+  }
+
+  function bloquearDatos(bloquear){
+    document.getElementById("apellidos").disabled = bloquear;
+    document.getElementById("nombres").disabled = bloquear;
+    document.getElementById("documento").disabled = bloquear;
+    document.getElementById("correoAprendiz").disabled = bloquear;
+  }
+
+  // ===============================
+  // SHARE: COPIAR / WHATSAPP / CORREO
+  // ===============================
+  async function copiarLink(){
+    const link = document.getElementById("linkToken").value.trim();
+    if (!link) return;
+    try{
+      await navigator.clipboard.writeText(link);
+      setMsg("✅ Link copiado. Pégalo en WhatsApp y envíalo al acudiente.");
+    }catch(e){
+      // fallback
+      const inp = document.getElementById("linkToken");
+      inp.select();
+      document.execCommand("copy");
+      setMsg("✅ Link copiado. Pégalo en WhatsApp y envíalo al acudiente.");
+    }
+  }
+
+  function compartirWhatsApp(){
+    const link = document.getElementById("linkToken").value.trim();
+    if (!link) return;
+
+    const nombre = (document.getElementById("nombres").value || "").trim();
+    const ap = (document.getElementById("apellidos").value || "").trim();
+    const doc = (document.getElementById("documento").value || "").trim();
+
+    const text = encodeURIComponent(
+      "Hola. Para continuar la matrícula SENA 2026, por favor realiza tu firma como acudiente.\n" +
+      "Aprendiz: " + nombre + " " + ap + " (Doc. " + doc + ")\n\n" +
+      "Abre este enlace seguro:\n" + link
+    );
+
+    // wa.me funciona bien en móvil y PC (abre WhatsApp Web si aplica)
+    window.open("https://wa.me/?text=" + text, "_blank");
+  }
+
+  function enviarCorreoAcudiente(){
+    const correoAcudiente = document.getElementById("correoAcudiente").value.trim();
+    if (!correoAcudiente) {
+      alert("Escribe el correo del acudiente.");
+      return;
+    }
+
+    const link = document.getElementById("linkToken").value.trim();
+    const nombreApr = (document.getElementById("nombres").value || "").trim() + " " + (document.getElementById("apellidos").value || "").trim();
+    const docApr = (document.getElementById("documento").value || "").trim();
+
+    setMsg("Enviando correo al acudiente...");
+
+    google.script.run
+      .withSuccessHandler(() => setMsg("✅ Enlace enviado al correo del acudiente.\nCuando firme, recibirás el enlace del formulario en tu correo."))
+      .withFailureHandler(err => setMsg("Error: " + err.message))
+      .enviarLinkAcudientePorCorreo(correoAcudiente, link, nombreApr.trim(), docApr);
+  }
+</script>
+</body>
+</html>
+
+    </textarea>
+
+    <textarea id="codigo3" class="hidden-store">
+/* Pega aquí el código 3 */
+//Abajo se enlaza la hoja de calculo de nombre CONFIG_SISTEMA_SENA -Pestaña inferior se nombra CONFIG
+
+const ID_SHEET_CONFIG = "1moyimPG2k5Dk7osKnkohlti28EiAjIuZqmG55XQs1AY";//PEGA_AQUI EL ID_DEL_SHEET_CONFIG
+
+const NOMBRE_HOJA_CONFIG = "CONFIG";
+
+
+
+
+
+
+
+
+
+
+/***************************************************************
+ * Desarrollado por Jonny Cardona
+ ***************************************************************/
+
+/***************************************************************
+ * 🔐 CARGAR CONFIGURACIÓN DESDE GOOGLE SHEETS (DINÁMICA)
+ ***************************************************************/
+function cargarConfig_() {
+
+  const ss = SpreadsheetApp.openById(ID_SHEET_CONFIG);
+  const hoja = ss.getSheetByName(NOMBRE_HOJA_CONFIG);
+
+
+  if (!hoja) {
+    throw new Error('No existe la hoja "' + NOMBRE_HOJA_CONFIG + '"');
+
+  }
+
+  const lastRow = hoja.getLastRow();
+
+  if (lastRow < 2) {
+    throw new Error("La hoja CONFIG no tiene datos.");
+  }
+
+  const datos = hoja.getRange(2, 1, lastRow - 1, 2).getValues();
+
+  const config = {};
+
+  datos.forEach(function(fila) {
+    const clave = String(fila[0] || "").trim();
+    const valor = String(fila[1] || "").trim();
+
+    if (clave) {
+      config[clave] = valor;
+    }
+  });
+
+  return config;
+}
+
+
+/*function cargarConfig_() {
+
+  const ss = SpreadsheetApp.openById(ID_SHEET_CONFIG);
+  const hoja = ss.getSheetByName("CONFIG");
+
+  const datos = hoja.getRange("A2:B29").getValues();
+
+  const config = {};
+
+  datos.forEach(function(fila) {
+    const clave = fila[0];
+    const valor = fila[1];
+    if (clave) {
+      config[String(clave).trim()] = String(valor).trim();
+    }
+  });
+
+  return config;
+}
+*/
+
+
+/***************************************************************
+ *
+ * 🔐 BLOQUE ÚNICO DE CONFIGURACIÓN
+ * SOLO EDITAR AQUÍ CUANDO CAMBIE DE CUENTA
+ *
+ ***************************************************************/
+/*const CONFIG = {
+
+  // 📁 Carpetas Drive
+  CARPETA_RAIZ: "1V7KpeFA6kB4tpyj02SQkZe6x-NShX_0i",
+  CARPETA_FIRMAS: "1-xxezbuhuVO-38GZAofsBzAcLDgqYixq",
+
+  // 📄 Plantillas Google Docs
+  PLANTILLA_1: "1FjMMuM4z-ayVNni4tIKwCegC-ts5RCqxX4fEhjzeukY",
+  PLANTILLA_2: "1bqqKxXkvkVLtpQL6CIx2x757BpGL6NzrZqaPGeDBxls",
+
+  // 📊 Planilla GFPI
+  PLANILLA_GFPI: "1Qs_wmKAVJPIu4saYEiuniwgVbBMJJ0MoutP816MCjcs",
+
+  // 🔗 Links externos
+  LINK_FIRMADOR: "https://www.ilovepdf.com/es/firmar-pdf",
+  LINK_CARGUE: "https://forms.gle/LiyDbY23qZJbfyBr6"
+
+};
+*/
+/**
+ * =====================================================
+ * FUNCIÓN PRINCIPAL
+ * Trigger: Al enviar formulario
+ * Flujo: Forms → Sheets → Docs → PDF → Email
+ * =====================================================
+ */
+function formSENA(e) {
+
+  const CONFIG = cargarConfig_();
+
+  if (!CONFIG.CARPETA_RAIZ) throw new Error("CONFIG: Falta CARPETA_RAIZ");
+if (!CONFIG.PLANTILLA_1) throw new Error("CONFIG: Falta PLANTILLA_1");
+if (!CONFIG.PLANTILLA_2) throw new Error("CONFIG: Falta PLANTILLA_2");
+if (!CONFIG.CARPETA_FIRMAS) throw new Error("CONFIG: Falta CARPETA_FIRMAS");
+if (!CONFIG.PLANILLA_GFPI) throw new Error("CONFIG: Falta PLANILLA_GFPI");
+if (!CONFIG.LINK_FIRMADOR) throw new Error("CONFIG: Falta LINK_FIRMADOR");
+if (!CONFIG.LINK_CARGUE) throw new Error("CONFIG: Falta LINK_CARGUE");
+
+
+
+  /* =====================================================
+   * 1. LECTURA DE DATOS DEL FORMULARIO (TEXTO)
+   *    Se mantiene e.values[] tal como solicitaste
+   * ===================================================== */
+
+  var primerNombA = e.values[1];
+  var primerApellA = e.values[2];
+  var segundoApellA = e.values[3];
+  var fecha = e.values[4];
+  var sex = e.values[5];
+  var rh = e.values[6];
+  var tipoDocA = e.values[7];
+  var numDocA = e.values[8];
+  var fechaExpA = e.values[9];
+  var lugarExped = e.values[10];
+  var municNacim = e.values[11];
+  var dptoNacim = e.values[12];
+  var direccion = e.values[13];
+  var barrio = e.values[14];
+  var email = e.values[15];
+  var cel = e.values[16];
+  var dicapac = e.values[17];
+  var discapaCual = e.values[18];
+  var prima = e.values[19];
+  var bachi = e.values[20];
+  var eps = e.values[21];
+  var estadoCiv = e.values[22];
+  var nomPMT = e.values[23];
+  var parentes = e.values[24];
+  var telFamili = e.values[25];
+  var tipoDocPMT = e.values[26];
+  var numDocPMT = e.values[27];
+  var lugarExpedDocPMT = e.values[28];
+  var programForm = e.values[29];
+
+  /* =====================================================
+   * 2. LECTURA CORRECTA DE FIRMAS (ARCHIVOS)
+   *    USAR e.namedValues (NO e.values)
+   * ===================================================== */
+  // (En esta versión, las firmas se buscan en Drive por documento, más abajo)
+
+
+  /* =====================================================
+   * 3. PROCESAMIENTO DE FECHAS Y VARIABLES
+   * ===================================================== */
+
+  var partesFecha = String(fecha || "").split("/");
+  var diaA = partesFecha[0] || "";
+  var mesA = getNombreMes(partesFecha[1] || "");
+  var anioA = partesFecha[2] || "";
+
+  var masculino = '', femenino = '', otroGenero = '';
+  if (sex === 'Masculino') masculino = 'X';
+  else if (sex === 'Femenino') femenino = 'X';
+  else if (sex === 'Otro') otroGenero = 'X';
+
+  var ti = '', cc = '', ce = '';
+  if (tipoDocA === 'Tarjeta de Identidad') ti = 'X';
+  else if (tipoDocA === 'Cédula de Ciudadanía') cc = 'X';
+  else if (tipoDocA === 'Cédula de Extranjería') ce = 'X';
+
+  /*================================
+   * nuevo codigo nombramiento
+   *=================================*/
+  var tipoDocCorto = "";
+
+  if (tipoDocA === 'Tarjeta de Identidad') tipoDocCorto = "TI";
+  else if (tipoDocA === 'Cédula de Ciudadanía') tipoDocCorto = "CC";
+  else if (tipoDocA === 'Permiso por Protección Temporal') tipoDocCorto = "PPT";
+  else tipoDocCorto = "PPT";
+
+  var partesFechaEx = String(fechaExpA || "").split("/");
+  var diaExpA = partesFechaEx[0] || "";
+  var mesExpA = getNombreMes(partesFechaEx[1] || "");
+  var anioExpA = partesFechaEx[2] || "";
+
+  var dS = '', dN = '';
+  if (dicapac === 'Sí') dS = 'X';
+  else if (dicapac === 'No') dN = 'X';
+
+
+  /* =====================================================
+   * 4. CREAR DOCUMENTO DESDE PLANTILLA
+   * ===================================================== */
+
+  // Carpeta raíz principal (donde quedan las carpetas de estudiantes)
+var carpetaRaiz = DriveApp.getFolderById(CONFIG.CARPETA_RAIZ);
+
+
+// Carpeta única ARCHIVOS_MASTER dentro de la raíz (aquí van DOC/PDF generados)
+var carpetaMaster = obtenerOCrearSubcarpeta_(carpetaRaiz, "ARCHIVOS_MASTER");
+
+
+
+
+  /* =====================================================
+   * 4.1 SUBCARPETA PARA ADJUNTOS DEL FORM (PDFs)
+   * ===================================================== */
+
+  // Generar nombre base estudiante (subcarpeta)
+  var nombreBaseEstudiante = generarNombreBaseEstudiante_(
+    tipoDocCorto,
+    numDocA,
+    primerApellA,
+    segundoApellA,
+    primerNombA
+  );
+
+  // Crear / obtener subcarpeta (aquí NO puede fallar porque carpetaSalida ya existe)
+  var carpetaEstudiante = obtenerOCrearSubcarpeta_(
+  carpetaRaiz,
+  nombreBaseEstudiante
+);
+
+  // 1. Documento de Identidad
+  guardarAdjuntoEnCarpeta_(
+    e,
+    "Documento de identidad",
+    carpetaEstudiante,
+    "1_" + tipoDocCorto + "_" + numDocA + "_Documento de Identidad"  );
+  /*
+guardarAdjuntoEnCarpeta_(
+    e,
+    "Documento de identidad",
+    carpetaEstudiante,
+    "1_" + tipoDocCorto + "_" + numDocA + "_Documento de Identidad_" + nombreBaseEstudiante
+  );
+  */
+
+  // 4. Documento Identificación Acudiente
+  guardarAdjuntoEnCarpeta_(
+    e,
+    "Documento identificación acudiente",
+    carpetaEstudiante,
+    "4_" + tipoDocCorto + "_" + numDocA + "_Documento de identificación Acudiente"
+  );
+
+  // 5. Certificación EPS
+  guardarAdjuntoEnCarpeta_(
+    e,
+    "Certificación EPS Aspirante desde el ADRES",//mismo nombre de la carpeta generada en Drive
+    carpetaEstudiante,
+    "5_" + tipoDocCorto + "_" + numDocA + "_CERTIFICACIÓN EPS"
+  );
+
+// 6. Registro Civil
+  guardarAdjuntoEnCarpeta_(
+    e,
+    "REGISTRO CIVIL ASPIRANTE",
+    carpetaEstudiante,
+    "6_" + tipoDocCorto + "_" + numDocA + "_Registro Civil"
+  );
+
+  // 7. DOCUMENTO DE CUSTODIA
+  guardarAdjuntoEnCarpeta_(
+    e,
+    "DOCUMENTO DE CUSTODIA",
+    carpetaEstudiante,
+    "7_" + tipoDocCorto + "_" + numDocA + "_DOCUMENTO DE CUSTODIA_"
+  );
+
+  /* =====================================================
+   * 4.2 PLANTILLAS (2 DOCS o MÁS)
+   * ===================================================== */
+
+  var plantillas = [
+    { id: CONFIG.PLANTILLA_1, nombre: "2_Compromiso del Aprendiz y Ficha de Matricula 2026" },
+    { id: CONFIG.PLANTILLA_2, nombre: "3_Autorización de Datos menor de edad" }
+  ];
+
+  // Adjuntos del correo (aquí guardaremos TODOS los PDFs generados + firmas)
+  var attachments = [];
+
+  // Generar documentos desde TODAS las plantillas
+  plantillas.forEach(function (p) {
+
+    var plantilla = DriveApp.getFileById(p.id);
+
+    // Nombre del archivo según tu regla
+    var nombreArchivo = "";
+
+    if (p.nombre.indexOf("2_") === 0) {
+      // 2_TipoDoc_NumDoc_Compromiso del Aprendiz_Apellidos_Nombres
+      nombreArchivo =
+        "2_" +
+        tipoDocCorto + "_" +
+        numDocA + "_" +
+        "Compromiso del Aprendiz_" +
+        construirApellidos_(primerApellA, segundoApellA) + "_" +
+        normalizarNombre_(primerNombA);
+    }
+    else if (p.nombre.indexOf("3_") === 0) {
+      // 3_TipoDoc_NumDoc_Autorización de Datos menor de edad_Apellidos_Nombres
+      nombreArchivo =
+        "3_" +
+        tipoDocCorto + "_" +
+        numDocA + "_" +
+        "Autorización de Datos menor de edad_" +
+        construirApellidos_(primerApellA, segundoApellA) + "_" +
+        normalizarNombre_(primerNombA);
+    }
+    else {
+      // Fallback por si agregas más plantillas después
+      nombreArchivo =
+        normalizarNombre_(p.nombre) + "_" +
+        tipoDocCorto + "_" + numDocA + "_" +
+        construirApellidos_(primerApellA, segundoApellA) + "_" +
+        normalizarNombre_(primerNombA);
+    }
+
+    // Copiar plantilla
+    var copy = plantilla.makeCopy(nombreArchivo, carpetaMaster);
+
+
+    var doc = DocumentApp.openById(copy.getId());
+    var body = doc.getBody();
+
+    /* =====================================================
+     * 5. REEMPLAZO DE MARCADORES DE TEXTO
+     * ===================================================== */
+
+    body.replaceText("{{PnombreA}}", primerNombA);
+    body.replaceText("{{PapellidoA}}", primerApellA);
+    body.replaceText("{{SapellidoA}}", segundoApellA);
+    body.replaceText("{{dia}}", diaA);
+    body.replaceText("{{mes}}", mesA);
+    body.replaceText("{{anio}}", anioA);
+    body.replaceText("{{M}}", masculino);
+    body.replaceText("{{F}}", femenino);
+    body.replaceText("{{OtroGenero}}", otroGenero);
+    body.replaceText("{{Rh}}", rh);
+    body.replaceText("{{TipoDocA}}", tipoDocA);
+    body.replaceText("{{TI}}", ti);
+    body.replaceText("{{CC}}", cc);
+    body.replaceText("{{CE}}", ce);
+    body.replaceText("{{NumDocA}}", numDocA);
+    body.replaceText("{{diaExpe}}", diaExpA);
+    body.replaceText("{{mesExpe}}", mesExpA);
+    body.replaceText("{{anoExpe}}", anioExpA);
+    body.replaceText("{{LEDocA}}", lugarExped);
+    body.replaceText("{{MuniNaciA}}", municNacim);
+    body.replaceText("{{DpNacA}}", dptoNacim);
+    body.replaceText("{{Direc}}", direccion);
+    body.replaceText("{{Barrio}}", barrio);
+    body.replaceText("{{Email}}", email);
+    body.replaceText("{{Cel}}", cel);
+    body.replaceText("{{DiscaS}}", dS);
+    body.replaceText("{{DiscaN}}", dN);
+    body.replaceText("{{DiscaCual}}", discapaCual);
+    body.replaceText("{{Prima}}", prima);
+    body.replaceText("{{Bachill}}", bachi);
+    body.replaceText("{{EPSCual}}", eps);
+    body.replaceText("{{EstCvA}}", estadoCiv);
+    //body.replaceText("{{NomFam}}", nombFamili);
+    body.replaceText("{{TelFam}}", telFamili);
+    body.replaceText("{{Parent}}", parentes);
+    body.replaceText("{{MPTNom}}", nomPMT);
+    body.replaceText("{{tipoDoc}}", tipoDocPMT);
+    body.replaceText("{{MPTDoc}}", numDocPMT);
+    body.replaceText("{{lugarExpe}}", lugarExpedDocPMT);
+    body.replaceText("{{PForm}}", programForm);
+
+    /* =====================================================
+     * 6. INSERCIÓN DE FIRMAS (IMÁGENES PNG)
+     * ===================================================== */
+    // (En tu flujo actual, NO insertamos firmas en el Doc.
+    //  Solo las adjuntamos al correo más abajo.)
+
+
+    /* =====================================================
+     * 7. GUARDAR Y EXPORTAR A PDF
+     * ===================================================== */
+
+    doc.saveAndClose();
+    Utilities.sleep(1500);
+
+    var pdfBlob = DriveApp
+      .getFileById(copy.getId())
+      .getAs("application/pdf")
+      .setName(copy.getName() + ".pdf");
+
+    // Guardar PDF en la carpeta
+    carpetaMaster.createFile(pdfBlob);
+
+
+    // Adjuntar PDF al correo
+    attachments.push(pdfBlob);
+
+  }); // <-- FIN forEach plantillas
+
+
+  /* =====================================================
+   * 7.1 ARMAR ADJUNTOS (FIRMAS PNG)
+   * ===================================================== */
+
+  // Buscar ambas firmas por documento (aprendiz y acudiente)
+  var firmas = buscarFirmasEnDrive_(
+    numDocA,      // documento aprendiz
+    numDocPMT     // documento acudiente
+  );
+
+  // Adjuntar firma aprendiz
+  if (firmas.aprendiz) {
+    var nombreAprendiz =
+      "FirmaAprendiz_" +
+      numDocA + "_" +
+      normalizarNombre_(primerApellA) + "_" +
+      normalizarNombre_(primerNombA) + ".png";
+
+    attachments.push(
+      firmas.aprendiz.copyBlob().setName(nombreAprendiz)
+    );
+  }
+
+  // Adjuntar firma acudiente (OJO: aquí va numDocPMT, no numDocA)
+  if (firmas.acudiente) {
+    var nombreAcudiente =
+      "FirmaAcudiente_" +
+      numDocPMT + "_" +
+      normalizarNombre_(primerApellA) + "_" +
+      normalizarNombre_(primerNombA) + ".png";
+
+    attachments.push(
+      firmas.acudiente.copyBlob().setName(nombreAcudiente)
+    );
+  }
+
+//ADAPTACIÓN PARA HOJA DE ASISTENCIA DE FIRMAS
+  actualizarPlanillaAsistencia_(
+  tipoDocCorto,
+  numDocA,
+  primerNombA,
+  primerApellA,
+  segundoApellA,
+  direccion,
+  email,
+  cel
+);
+
+
+
+  /* =====================================================
+   * 8. ENVÍO DE CORREO
+   * ===================================================== */
+
+  var cuerpoCorreo =
+    'Hola, ' + primerNombA + ' ' + primerApellA + ' ' + segundoApellA + '\n\n' +
+    'Apreciado(a) aspirante a aprendiz, a continuación encontrará los archivos adjuntos en PDF y PNG:\n\n' +
+    
+    '✔- FORMATO “MI COMPROMISO COMO APRENDIZ SENA” junto con el FORMATO DE APOYO FR-09 - FICHA DE MATRICULA.\n' +
+    '✔- FORMATO “TRATAMIENTO DE DATOS MENOR DE EDAD”.\n' +
+    '✔- Firma elaborada por ti en imagen PNG”.\n' +
+    '✔- Firma de tu acudiente en imagen PNG.\n\n' +
+    'Realice estos sencillos pasos: ⮕\n\n' +
+    '1- Descargue todos los archivos adjuntos.⬇⬇⬇ \n' +
+    '2- Ingrese al siguiente enlace para realizar la firma electrónica de los formatos PDF adjuntos: ' + CONFIG.LINK_FIRMADOR + ' \n' +
+    '3- Una vez firmados los documentos y posteriormente descargados, carguelos al siguiente enlace: ' + CONFIG.LINK_CARGUE + ' \n\n' +
+    'TE COMPARTIMOS UN VÍDEO DE APOYO PARA QUE SIGAS LOS PASOS: \n\n'+
+    CONFIG.LINK_VIDEO_APOYO + '\n\n' +
+    'Por último debes estar pendiente a cualquier comunicación por parte del SENA por si surgen observaciones en los documentos cargados en la plataforma. \n\n'+
+    'Te esperan nuevas experiencias SENA que transformarán tu vida!';
+
+  GmailApp.sendEmail(
+    email,
+    "Formulario Aspirante Aprendiz SENA CBI",
+    cuerpoCorreo,
+    { attachments: attachments }
+  );
+}
+
+
+/* =====================================================
+ * UTILIDAD: MES NUMÉRICO → TEXTO
+ * ===================================================== */
+function getNombreMes(n) {
+  return {
+    "01": "enero", "02": "febrero", "03": "marzo",
+    "04": "abril", "05": "mayo", "06": "junio",
+    "07": "julio", "08": "agosto", "09": "septiembre",
+    "10": "octubre", "11": "noviembre", "12": "diciembre"
+  }[n] || "";
+}
+
+
+/* =====================================================
+ * BUSCAR FIRMAS PNG EN DRIVE (PARA ADJUNTAR)
+ * ===================================================== */
+function buscarFirmasEnDrive_(docAprendiz, docAcudiente) {
+  const CONFIG = cargarConfig_();
+
+
+  const carpetaFirmas = DriveApp.getFolderById(CONFIG.CARPETA_FIRMAS);
+
+  const archivos = carpetaFirmas.getFilesByType(MimeType.PNG);
+
+  var firmaAprendiz = null;
+  var firmaAcudiente = null;
+
+  var dA = String(docAprendiz || "").trim();
+  var dC = String(docAcudiente || "").trim();
+
+  while (archivos.hasNext()) {
+
+    const archivo = archivos.next();
+    const nombre = archivo.getName().toUpperCase();
+
+    // Buscar firma del aprendiz por su documento
+    if (dA && nombre.indexOf(dA) !== -1 && nombre.indexOf("APRENDIZ") !== -1) {
+      firmaAprendiz = archivo.getBlob();
+    }
+
+    // Buscar firma del acudiente por su documento
+    if (dC && nombre.indexOf(dC) !== -1 && nombre.indexOf("ACUDIENTE") !== -1) {
+      firmaAcudiente = archivo.getBlob();
+    }
+  }
+
+  return {
+    aprendiz: firmaAprendiz,
+    acudiente: firmaAcudiente
+  };
+}
+
+
+/**
+ * Normaliza texto para comparar (mayúsculas, sin acentos, espacios a _)
+ */
+function normalizarNombre_(s) {
+  return String(s || "")
+    .toUpperCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // quita acentos
+    .replace(/\s+/g, "_");
+}
+
+
+/**
+ * Construye apellidos (uno o dos) ya normalizados y unidos por _
+ */
+function construirApellidos_(apellido1, apellido2) {
+  var a1 = normalizarNombre_(apellido1);
+  var a2 = normalizarNombre_(apellido2);
+  if (a2 && a2.trim() !== "") return a1 + "_" + a2;
+  return a1;
+}
+
+
+function generarNombreBaseEstudiante_(tipoDocCorto, numDoc, apellido1, apellido2, nombres) {
+
+  var apellidos = apellido1;
+  if (apellido2 && apellido2.trim() !== "") {
+    apellidos += "_" + apellido2;
+  }
+
+  return (
+    tipoDocCorto + "_" +
+    numDoc + "_" +
+    normalizarNombre_(apellidos) + "_" +
+    normalizarNombre_(nombres)
+  );
+}
+
+
+function obtenerOCrearSubcarpeta_(parentFolder, nombreSubcarpeta) {
+
+  var folders = parentFolder.getFoldersByName(nombreSubcarpeta);
+
+  if (folders.hasNext()) {
+    return folders.next();
+  }
+
+  return parentFolder.createFolder(nombreSubcarpeta);
+}
+
+
+function guardarAdjuntoEnCarpeta_(e, nombrePregunta, carpetaDestino, nuevoNombre) {
+
+  if (!e.namedValues || !e.namedValues[nombrePregunta]) return;
+
+  // En Forms puede venir ID o URL. Tomamos el primer valor.
+  var raw = e.namedValues[nombrePregunta][0];
+  if (!raw) return;
+
+  // Extraer ID de Drive de forma robusta
+  var match = String(raw).match(/[-\w]{25,}/);
+  if (!match) return;
+
+  var fileId = match[0];
+  var archivoOriginal = DriveApp.getFileById(fileId);
+
+  archivoOriginal.makeCopy(
+    nuevoNombre + ".pdf",
+    carpetaDestino
+  );
+}
+
+
+/***************************************************************
+ * ACTUALIZAR PLANILLA GFPI ASISTENCIA
+ ***************************************************************/
+function actualizarPlanillaAsistencia_(
+  tipoDoc,
+  numeroDoc,
+  nombres,
+  apellido1,
+  apellido2,
+  direccion,
+  correo,
+  telefono
+) {
+
+  const CONFIG = cargarConfig_();
+
+  if (!CONFIG.PLANILLA_GFPI) {
+    throw new Error("CONFIG: Falta PLANILLA_GFPI");
+  }
+
+  const ss = SpreadsheetApp.openById(CONFIG.PLANILLA_GFPI);
+
+  const hojas = ["asistencia_mod1", "asistencia_mod2"];
+
+  for (let i = 0; i < hojas.length; i++) {
+
+    const hoja = ss.getSheetByName(hojas[i]);
+    if (!hoja) continue;
+
+    const resultado = escribirEnHoja_(
+      hoja,
+      tipoDoc,
+      numeroDoc,
+      nombres,
+      apellido1,
+      apellido2,
+      direccion,
+      correo,
+      telefono
+    );
+
+    if (resultado === "OK") return;
+  }
+
+  throw new Error("Las hojas de asistencia están llenas.");
+}
+
+
+
+
+/***************************************************************
+ * ESCRIBE O SOBRESCRIBE EN RANGO B11:K30
+ ***************************************************************/
+function escribirEnHoja_(
+  hoja,
+  tipoDoc,
+  numeroDoc,
+  nombres,
+  apellido1,
+  apellido2,
+  direccion,
+  correo,
+  telefono
+) {
+
+  const FILA_INICIO = 11;
+  const FILA_FIN = 30;
+
+  const datos = hoja.getRange("B11:K30").getValues();
+
+  let filaLibre = null;
+
+  for (let i = 0; i < datos.length; i++) {
+
+    const fila = datos[i];
+
+    const docExistente = String(fila[1] || "").trim();     // Col C
+    const apellidoExistente = String(fila[4] || "").trim(); // Col F
+
+    // 🔁 Si ya existe mismo documento + primer apellido → sobrescribir
+    if (
+      docExistente === String(numeroDoc).trim() &&
+      apellidoExistente.toUpperCase() === String(apellido1).toUpperCase()
+    ) {
+
+      escribirFila_(
+        hoja,
+        FILA_INICIO + i,
+        tipoDoc,
+        numeroDoc,
+        nombres,
+        apellido1,
+        apellido2,
+        direccion,
+        correo,
+        telefono
+      );
+
+      return "OK";
+    }
+
+    // 📌 Detectar fila libre (col C vacía)
+    if (!docExistente && filaLibre === null) {
+      filaLibre = FILA_INICIO + i;
+    }
+  }
+
+  // 🆕 Si no existe pero hay fila libre
+  if (filaLibre !== null) {
+
+    escribirFila_(
+      hoja,
+      filaLibre,
+      tipoDoc,
+      numeroDoc,
+      nombres,
+      apellido1,
+      apellido2,
+      direccion,
+      correo,
+      telefono
+    );
+
+     //  Insertar firma PNG en columna L/M
+  insertarFirmaEnCelda_(
+  hoja,
+  filaLibre,
+  apellido1,
+  apellido2,
+  nombres,
+  numeroDoc
+);
+
+
+    return "OK";
+  }
+
+  return "FULL";
+}
+
+
+
+
+/***************************************************************
+ * ESCRIBE DATOS EN UNA FILA ESPECÍFICA
+ ***************************************************************/
+/*function escribirFila_(
+  hoja,
+  fila,
+  tipoDoc,
+  numeroDoc,
+  nombres,
+  apellido1,
+  apellido2,
+  direccion,
+  correo,
+  telefono
+) {
+
+  hoja.getRange("B" + fila).setValue(tipoDoc);
+  hoja.getRange("C" + fila).setValue(numeroDoc);
+  hoja.getRange("D" + fila).setValue(nombres);
+  hoja.getRange("F" + fila).setValue(apellido1 + " " + apellido2);
+  hoja.getRange("H" + fila).setValue(direccion);
+  hoja.getRange("I" + fila).setValue(correo);
+  hoja.getRange("K" + fila).setValue(telefono);
+}
+*/
+
+function escribirFila_(
+  hoja,
+  fila,
+  tipoDoc,
+  numeroDoc,
+  nombres,
+  apellido1,
+  apellido2,
+  direccion,
+  correo,
+  telefono
+) {
+
+  hoja.getRange("B" + fila).setValue(tipoDoc);
+  hoja.getRange("C" + fila).setValue(numeroDoc);
+  hoja.getRange("D" + fila).setValue(nombres);
+  hoja.getRange("F" + fila).setValue(apellido1 + " " + apellido2);
+  hoja.getRange("H" + fila).setValue(direccion);
+  hoja.getRange("I" + fila).setValue(correo);
+  hoja.getRange("K" + fila).setValue(telefono);
+
+  //  INSERTAR FIRMA PNG EN COLUMNA L
+
+  insertarFirmaEnCelda_(
+    hoja,
+    fila,
+    numeroDoc,
+    apellido1,
+    apellido2,
+    nombres
+  );
+}
+
+
+/***********************************************************
+ * CONSTRUIR NOMBRE EXACTO DE LA FIRMA
+ ***********************************************************/
+function construirNombreFirma_(apellido1, apellido2, nombres, numeroDoc) {
+
+  var a1 = normalizarNombre_(apellido1);
+  var a2 = normalizarNombre_(apellido2);
+  var nom = normalizarNombre_(nombres);
+  var doc = String(numeroDoc || "").trim();
+
+  // Construir bloque apellidos dinámico
+  var bloqueApellidos = a1;
+  if (a2 && a2 !== "") {
+    bloqueApellidos += "_" + a2;
+  }
+
+  var nombreArchivo =
+    bloqueApellidos + "_" +
+    nom + "_" +
+    doc + "_APRENDIZ.png";
+
+  Logger.log("Nombre final construido: " + nombreArchivo);
+
+  return nombreArchivo;
+}
+
+
+
+
+/***********************************************************
+ * INSERTAR FIRMA PNG EN CELDA L (L/M combinadas)
+ ***********************************************************/
+
+function insertarFirmaEnCelda_(hoja, fila, apellido1, apellido2, nombres, numeroDoc) {
+  const CONFIG = cargarConfig_();
+
+  const carpetaFirmas = DriveApp.getFolderById(CONFIG.CARPETA_FIRMAS);
+
+
+  // ================================
+  // 1️⃣ Normalizar datos EXACTAMENTE
+  // igual que el sistema de firmas
+  // ================================
+
+  var a1 = normalizarNombre_(apellido1);
+  var a2 = normalizarNombre_(apellido2);
+  var nom = normalizarNombre_(nombres);
+  var doc = String(numeroDoc || "").trim();
+
+  // Construir apellidos dinámicamente (sin doble "_")
+  var apellidos = a1;
+  if (a2 && a2 !== "") {
+    apellidos += "_" + a2;
+  }
+
+  // Nombre EXACTO esperado
+  var nombreArchivo =
+    apellidos + "_" +
+    nom + "_" +
+    doc + "_APRENDIZ.png";
+
+  Logger.log("Buscando archivo exacto: " + nombreArchivo);
+
+  // ================================
+  // 2️⃣ Buscar coincidencia exacta
+  // ================================
+
+  var archivos = carpetaFirmas.getFilesByName(nombreArchivo);
+
+  if (archivos.hasNext()) {
+
+    var archivo = archivos.next();
+
+    hoja.insertImage(archivo.getBlob(), 12, fila)
+        .setWidth(110)
+        .setHeight(45);
+
+    Logger.log("Firma encontrada exacta: " + nombreArchivo);
+    return;
+  }
+
+  // ================================
+  // 3️⃣ RESPALDO INTELIGENTE
+  // Buscar solo por documento + APRENDIZ
+  // ================================
+
+  Logger.log("No encontrada exacta. Buscando por documento...");
+
+  var todos = carpetaFirmas.getFiles();
+
+  while (todos.hasNext()) {
+
+    var f = todos.next();
+    var nombre = f.getName();
+
+    if (
+      nombre.includes(doc) &&
+      nombre.includes("APRENDIZ")
+    ) {
+
+      hoja.insertImage(f.getBlob(), 12, fila)
+          .setWidth(110)
+          .setHeight(45);
+
+      Logger.log("Firma encontrada por documento: " + nombre);
+      return;
+    }
+  }
+
+  Logger.log("No se encontró ninguna firma para documento: " + doc);
+}
+
+
+    </textarea>
+
+    <textarea id="codigo4" class="hidden-store">
+/* Pega aquí el código 4 */
+const ID_CONFIG_SHEET = "1moyimPG2k5Dk7osKnkohlti28EiAjIuZqmG55XQs1AY";
+const NOMBRE_HOJA_CONFIG = "CONFIG";
+
+function cargarConfig_() {
+
+  const ss = SpreadsheetApp.openById(ID_CONFIG_SHEET);
+  const hoja = ss.getSheetByName(NOMBRE_HOJA_CONFIG);
+
+  if (!hoja) {
+    throw new Error('No existe la hoja "' + NOMBRE_HOJA_CONFIG + '"');
+  }
+
+  const lastRow = hoja.getLastRow();
+
+  if (lastRow < 2) {
+    return {};
+  }
+
+  const datos = hoja.getRange(2, 1, lastRow - 1, 2).getValues();
+
+  const config = {};
+
+  datos.forEach(function(fila) {
+    const clave = String(fila[0] || "").trim();
+    const valor = String(fila[1] || "").trim();
+    if (clave) config[clave] = valor;
+  });
+
+  return config;
+}
+
+
+
+/***************************************************************
+ CONFIGURACIÓN Desarrollado por Jonny Cardona
+***************************************************************/
+
+// ID del documento DESTINO (Planilla estructurada)
+
+
+// Nombres de hojas destino
+const HOJAS_DESTINO = ["asistencia_mod1", "asistencia_mod2"];
+
+const FILA_INICIO = 11;
+const FILA_FIN = 30;
+
+
+/***************************************************************
+ FUNCIÓN PRINCIPAL (SE EJECUTA DESDE EL SPREADSHEET A)
+***************************************************************/
+function onFormSubmit(e) {
+
+
+const CONFIG = cargarConfig_();
+
+if (!CONFIG.PLANILLA_GFPI) {
+  throw new Error("CONFIG: Falta PLANILLA_GFPI");
+}
+
+const ssDestino = SpreadsheetApp.openById(CONFIG.PLANILLA_GFPI);
+
+ 
+
+  const tipoDoc   = e.namedValues["Tipo de documento del aprendiz"]?.[0] || "";
+  const numeroDoc = e.namedValues["Número de documento del aprendiz"]?.[0] || "";
+  const nombres   = e.namedValues["Nombres del aprendiz"]?.[0] || "";
+  const apellidos = e.namedValues["Apellidos del aprendiz"]?.[0] || "";
+  const direccion = e.namedValues["Dirección"]?.[0] || "";
+  const correo    = e.namedValues["Correo electrónico"]?.[0] || "";
+  const telefono  = e.namedValues["Teléfono"]?.[0] || "";
+
+  if (!numeroDoc || !apellidos) {
+    throw new Error("Documento o apellido vacío.");
+  }
+
+  const primerApellidoNuevo = apellidos.trim().split(/\s+/)[0].toUpperCase();
+
+  let espacioLibre = null;
+
+  for (let nombreHoja of HOJAS_DESTINO) {
+
+    const hoja = ssDestino.getSheetByName(nombreHoja);
+    if (!hoja) continue;
+
+    for (let fila = FILA_INICIO; fila <= FILA_FIN; fila++) {
+
+      const numeroExistente = hoja.getRange(fila, 3).getValue();
+      const apellidoExistente = hoja.getRange(fila, 6).getValue();
+
+      if (numeroExistente == numeroDoc &&
+          String(apellidoExistente).split(" ")[0].toUpperCase() === primerApellidoNuevo) {
+
+        escribirFila_(hoja, fila, tipoDoc, numeroDoc, nombres, apellidos, direccion, correo, telefono);
+        return;
+      }
+
+      if (!numeroExistente && !espacioLibre) {
+        espacioLibre = { hoja: hoja, fila: fila };
+      }
+    }
+  }
+
+  if (espacioLibre) {
+    escribirFila_(
+      espacioLibre.hoja,
+      espacioLibre.fila,
+      tipoDoc,
+      numeroDoc,
+      nombres,
+      apellidos,
+      direccion,
+      correo,
+      telefono
+    );
+    return;
+  }
+
+  throw new Error("Las hojas destino están llenas.");
+}
+
+
+/***************************************************************
+ ESCRIBIR RESPETANDO CELDAS COMBINADAS
+***************************************************************/
+function escribirFila_(hoja, fila, tipoDoc, numeroDoc, nombres, apellidos, direccion, correo, telefono) {
+
+  hoja.getRange(fila, 2).setValue(tipoDoc);       // B
+  hoja.getRange(fila, 3).setValue(numeroDoc);     // C
+  hoja.getRange(fila, 4).setValue(nombres);       // D (D-E)
+  hoja.getRange(fila, 6).setValue(apellidos);     // F (F-G)
+  hoja.getRange(fila, 8).setValue(direccion);     // H
+  hoja.getRange(fila, 9).setValue(correo);        // I (I-J)
+  hoja.getRange(fila, 11).setValue(telefono);     // K
+}
+
+    </textarea>
+
+    <textarea id="codigo5" class="hidden-store">
+/* Pega aquí el código 5 */
+/***************************************************************
+ *
+ * 🔐 CONFIG DINÁMICA DESDE GOOGLE SHEETS EXTERNO Desarrollado por Jonny Cardona
+ *
+ ***************************************************************/
+
+// 🔹 ID del Spreadsheet donde está la hoja "CONFIG"
+// 👉 AQUÍ solo cambias si cambias de cuenta
+const ID_CONFIG_SHEET = "1moyimPG2k5Dk7osKnkohlti28EiAjIuZqmG55XQs1AY";//PEGA_AQUI_EL_ID_DEL_SHEET_CONFIG
+
+const NOMBRE_HOJA_CONFIG = "CONFIG";
+
+function cargarConfigDesdeSheet_() {
+
+  const ss = SpreadsheetApp.openById(ID_CONFIG_SHEET);
+  const hoja = ss.getSheetByName(NOMBRE_HOJA_CONFIG);
+
+  if (!hoja) {
+    throw new Error('No existe la hoja "' + NOMBRE_HOJA_CONFIG + '"');
+  }
+
+  const lastRow = hoja.getLastRow();
+
+if (lastRow < 2) {
+  throw new Error("La hoja CONFIG no tiene datos.");
+}
+
+const valores = hoja.getRange(2, 1, lastRow - 1, 2).getValues();
+
+
+  const cfg = {};
+
+  valores.forEach(r => {
+    const clave = String(r[0] || "").trim();
+    const valor = String(r[1] || "").trim();
+    if (clave) cfg[clave] = valor;
+  });
+
+  return cfg;
+}
+
+
+
+/***************************************************************
+ *  CONFIGURACIÓN GENERAL
+ ***************************************************************/
+
+// ID de la carpeta RAÍZ donde ya existen
+// las subcarpetas tipo: Tipo de documento_NUmero de documento_Nombre_del_aprendiz
+
+
+
+
+/***************************************************************
+ *  FUNCIÓN PRINCIPAL – SE EJECUTA AL ENVIAR EL FORMULARIO
+ ***************************************************************/
+function onFormSubmit(e) {
+
+  const CONFIG = cargarConfigDesdeSheet_();
+
+  try {
+
+    /***********************************************************
+     * 1️⃣ OBTENER DATOS DEL FORMULARIO
+     ***********************************************************/
+
+    var tipoDocAprendiz   = e.namedValues["Tipo de documento del aprendiz"]?.[0] || "";
+var numeroDocAprendiz = e.namedValues["Número de documento del aprendiz"]?.[0] || "";
+var nombreAprendiz    = e.namedValues["Nombres del aprendiz"]?.[0] || "";
+var programa          = e.namedValues["Técnico que aplica:"]?.[0] || "";
+var correoAprendiz    = e.namedValues["Correo electrónico"]?.[0] || "";
+
+var archivoActa         = e.namedValues["Acta de compromiso y Ficha de Matricula"]?.[0] || "";
+var archivoAutorizacion = e.namedValues["Autorización de datos menor de edad"]?.[0] || "";
+
+    /***********************************************************
+     * 2️⃣ ABRIR CARPETA RAÍZ
+     ***********************************************************/
+    
+
+    if (!CONFIG.CARPETA_RAIZ) {
+  throw new Error("CONFIG: Falta CARPETA_RAIZ");
+}
+
+const carpetaRaiz = DriveApp.getFolderById(CONFIG.CARPETA_RAIZ);//ID_CARPETA_RAIZ
+
+
+    /***********************************************************
+     * 3️⃣ BUSCAR SUBCARPETA EXISTENTE DEL APRENDIZ
+     *     ⚠️ NO CREA CARPETAS NUEVAS
+     ***********************************************************/
+    const subCarpeta = obtenerSubcarpetaAprendiz_(carpetaRaiz, numeroDocAprendiz);
+
+    if (!subCarpeta) {
+      throw new Error("No se encontró la carpeta del aprendiz con documento: " + numeroDocAprendiz);
+    }
+
+    /***********************************************************
+     * 4️⃣ CONVERTIR TIPO DOCUMENTO A ABREVIATURA (TI, CC, PPT)
+     ***********************************************************/
+    const tipoAbreviado = obtenerAbreviatura_(tipoDocAprendiz);
+
+    /***********************************************************
+     * 5️⃣ GUARDAR ACTA
+     ***********************************************************/
+    guardarArchivoEnCarpeta_(
+      archivoActa,
+      subCarpeta,
+      `2_${tipoAbreviado}_${numeroDocAprendiz}_Acta de compromiso y Ficha de Matricula.pdf`
+    );
+
+    /***********************************************************
+     * 6️⃣ GUARDAR AUTORIZACIÓN
+     ***********************************************************/
+    guardarArchivoEnCarpeta_(
+      archivoAutorizacion,
+      subCarpeta,
+      `3_${tipoAbreviado}_${numeroDocAprendiz}_Autorización de datos de menor de edad.pdf`
+    );
+
+    /***********************************************************
+     * 7️⃣ ENVIAR CORREO PERSONALIZADO
+     ***********************************************************/
+    enviarCorreoConfirmacion_(
+      correoAprendiz,
+      nombreAprendiz,
+      programa
+    );
+
+  } catch (error) {
+
+    Logger.log("ERROR EN onFormSubmit: " + error.message);
+    throw error;
+
+  }
+}
+
+
+/***********************************************************
+     * BUSCAR SUBCARPETA EXISTENTE (NO CREA NUEVA)
+***********************************************************/
+
+function obtenerSubcarpetaAprendiz_(carpetaRaiz, numeroDocumento) {
+
+  const carpetas = carpetaRaiz.getFolders();
+
+  while (carpetas.hasNext()) {
+
+    const carpeta = carpetas.next();
+    const nombre = carpeta.getName();
+
+    // Busca patrón exacto: _NUMERO_
+    if (nombre.includes("_" + numeroDocumento + "_")) {
+      return carpeta;
+    }
+  }
+
+  return null; // Si no encuentra
+}
+
+
+/***********************************************************
+     * GUARDAR ARCHIVO EN SUBCARPETA CON CONTROL DE DUPLICADOS
+***********************************************************/
+
+
+function guardarArchivoEnCarpeta_(urlArchivo, carpetaDestino, nombreBase) {
+
+  if (!urlArchivo) {
+  throw new Error("No se recibió archivo.");
+}
+
+
+  // Extraer ID del archivo desde URL
+  const fileIdMatch = urlArchivo.match(/[-\w]{25,}/);
+
+  if (!fileIdMatch) {
+    throw new Error("No se pudo extraer el ID del archivo.");
+  }
+
+  const fileId = fileIdMatch[0];
+  const archivoOriginal = DriveApp.getFileById(fileId);
+
+  // Validar que sea PDF
+  if (archivoOriginal.getMimeType() !== MimeType.PDF) {
+    throw new Error("Solo se permiten archivos PDF.");
+  }
+
+  const blob = archivoOriginal.getBlob();
+
+  // Generar nombre único si ya existe
+  const nombreFinal = generarNombreUnico_(carpetaDestino, nombreBase);
+
+  carpetaDestino.createFile(blob.setName(nombreFinal));
+}
+
+
+/***********************************************************
+     * GENERAR NOMBRE CON _2, _3, _4 SI YA EXISTE
+***********************************************************/
+
+
+function generarNombreUnico_(carpeta, nombreBase) {
+
+  let nombreFinal = nombreBase;
+  let contador = 2;
+
+  while (carpeta.getFilesByName(nombreFinal).hasNext()) {
+
+    nombreFinal = nombreBase.replace(".pdf", "") + "_" + contador + ".pdf";
+    contador++;
+  }
+
+  return nombreFinal;
+}
+
+
+/***********************************************************
+     * CONVERTIR TIPO DOCUMENTO A SIGLA
+***********************************************************/
+
+
+function obtenerAbreviatura_(tipo) {
+
+  tipo = String(tipo || "").toUpperCase();
+
+  if (tipo.includes("TARJETA")) return "TI";
+  if (tipo.includes("CEDULA")) return "CC";
+  if (tipo.includes("PPT")) return "PPT";
+
+  return "DOC";
+}
+
+
+/***********************************************************
+     * CORREO PERSONALIZADO PROFESIONAL
+***********************************************************/
+
+
+function enviarCorreoConfirmacion_(correo, nombre, programa) {
+
+  const asunto = "Documentos recibidos - Proceso Matrícula SENA 2026";
+
+  const mensaje =
+`Hola ${nombre},
+
+Estás próximo a ser parte del programa de formación:
+
+${programa}
+
+Hemos recibido correctamente los documentos solicitados.
+Serán revisados por el equipo académico y administrativo.
+
+Si se presenta alguna novedad, te contactaremos oportunamente.
+
+Te invitamos a estar atento a tu correo o tu número telefónico para continuar el proceso.
+
+Bienvenido a esta nueva etapa.
+Cada paso que das construye tu futuro. 
+
+Equipo SENA`;
+
+  GmailApp.sendEmail(
+    String(correo || "").trim(),
+    asunto,
+    mensaje
+  );
+}
+
+
+
+
+    </textarea>
+  </main>
+
+  <script>
+    function setEstado(texto, tipo){
+      const msg = document.getElementById("msg");
+      const badge = document.getElementById("badge");
+      msg.textContent = texto;
+
+      badge.className = "badge";
+      if (tipo === "ok") { badge.classList.add("ok"); badge.textContent = "Copiado ✅"; }
+      else if (tipo === "err") { badge.classList.add("err"); badge.textContent = "Error ⚠️"; }
+      else { badge.textContent = "Esperando…"; }
+    }
+
+    async function copiar(idTextarea, etiqueta){
+      const el = document.getElementById(idTextarea);
+      if (!el) {
+        setEstado("No se encontró el contenido para copiar.", "err");
+        return;
+      }
+
+      const texto = el.value;
+
+      try {
+        // Método moderno
+        await navigator.clipboard.writeText(texto);
+        setEstado(etiqueta + " copiado al portapapeles.", "ok");
+      } catch (e) {
+        // Fallback (seleccionar y copiar)
+        try {
+          el.focus();
+          el.select();
+          document.execCommand("copy");
+          el.blur();
+          setEstado(etiqueta + " copiado al portapapeles.", "ok");
+        } catch (e2) {
+          setEstado("El navegador bloqueó el copiado. Abre esto en HTTPS o localhost.", "err");
+        }
+      }
+    }
+  </script>
+</body>
+</html>
