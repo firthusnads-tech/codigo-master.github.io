@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Copiador de códigos (5 botones)</title>
+  <title>Copiador de códigos (6 botones)</title>
   <style>
     :root{
       --bg1:#4a148c;
@@ -118,6 +118,9 @@
       Presiona un botón y el código se copiará al portapapeles (sin mostrarse).
       Luego solo pega donde lo necesites.
     </p>
+    <p class="sub">
+      Elaborado por Jonny Cardona 2026
+    </p>
 
     <section class="grid">
       <button type="button" onclick="copiar('codigo1', 'Código 1')">1- 📋 Código Firma Digital Script</button>
@@ -125,6 +128,7 @@
       <button type="button" onclick="copiar('codigo3', 'Código 3')">3- 📋 Código Formulario Matricula</button>
       <button type="button" onclick="copiar('codigo4', 'Código 4')">4- 📋 Código FIRMAS. GFPI-PL-001</button>
       <button type="button" onclick="copiar('codigo5', 'Código 5')">5- 📋 Código Carga de Documentos Firmados</button> 
+      <button type="button" onclick="copiar('codigo6', 'Código 6')">6- 📋 Código ACTUALIZADO-PRO MATRICULAS + EXCEL/BOTON</button>
     </section>
 
     <div class="status" aria-live="polite">
@@ -2612,6 +2616,1049 @@ Equipo SENA`;
 
 
     </textarea>
+
+
+<textarea id="codigo6" class="hidden-store">
+
+  //Abajo se enlaza la hoja de calculo de nombre CONFIG_SISTEMA_SENA -Pestaña inferior se nombra CONFIG
+
+
+
+
+const ID_SHEET_CONFIG = "1aICAX6IK_-WdhWwDPddGG6Vr0oPDyzv9jMAxpB-eeZM";//PEGA_AQUI EL ID_DEL_SHEET_CONFIG
+
+
+
+
+
+const NOMBRE_HOJA_CONFIG = "CONFIG";
+
+
+
+
+
+
+
+
+
+
+/***************************************************************
+ * Desarrollado por Jonny Cardona
+ ***************************************************************/
+
+
+
+
+
+
+
+
+
+/**
+ * Crea un menú personalizado en la hoja de cálculo al abrirla.
+ */
+function onOpen() {
+  var ui = SpreadsheetApp.getUi();
+  ui.createMenu('⚙️ Procesar SENA')
+      .addItem('Generar Documento de Fila Seleccionada', 'procesarFilaManual')
+      .addToUi();
+}
+
+/**
+ * Función que captura los datos de la fila actual y los envía a formSENA.
+ */
+function procesarFilaManual() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var filaActual = sheet.getActiveCell().getRow();
+  
+  // Obtenemos todos los datos de esa fila específica
+  // Asumimos que tus datos empiezan en la columna A y terminan en la AH (aprox 34 columnas)
+  var rango = sheet.getRange(filaActual, 1, 1, sheet.getLastColumn());
+  var valores = rango.getValues()[0]; 
+
+  // Validamos si la fila tiene datos (por ejemplo, si el nombre no está vacío)
+  if (valores[1] === "") {
+    SpreadsheetApp.getUi().alert("La fila seleccionada parece estar vacía.");
+    return;
+  }
+
+  // Simulamos el objeto "e" que enviaba el formulario
+  var eSimulado = {
+    values: valores
+  };
+
+  // Llamamos a tu función principal
+  try {
+    SpreadsheetApp.getUi().alert("Iniciando proceso para: " + valores[1] + " " + valores[2]);
+    formSENA(eSimulado);
+    SpreadsheetApp.getUi().alert("✅ Proceso completado con éxito.");
+  } catch (err) {
+    SpreadsheetApp.getUi().alert("❌ Error: " + err.toString());
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/***************************************************************
+ * 🔐 CARGAR CONFIGURACIÓN DESDE GOOGLE SHEETS (DINÁMICA)
+ ***************************************************************/
+function cargarConfig_() {
+
+  const ss = SpreadsheetApp.openById(ID_SHEET_CONFIG);
+  const hoja = ss.getSheetByName(NOMBRE_HOJA_CONFIG);
+
+
+  if (!hoja) {
+    throw new Error('No existe la hoja "' + NOMBRE_HOJA_CONFIG + '"');
+
+  }
+
+  const lastRow = hoja.getLastRow();
+
+  if (lastRow < 2) {
+    throw new Error("La hoja CONFIG no tiene datos.");
+  }
+
+  const datos = hoja.getRange(2, 1, lastRow - 1, 2).getValues();
+
+  const config = {};
+
+  datos.forEach(function(fila) {
+    const clave = String(fila[0] || "").trim();
+    const valor = String(fila[1] || "").trim();
+
+    if (clave) {
+      config[clave] = valor;
+    }
+  });
+
+  return config;
+}
+
+
+/*function cargarConfig_() {
+
+  const ss = SpreadsheetApp.openById(ID_SHEET_CONFIG);
+  const hoja = ss.getSheetByName("CONFIG");
+
+  const datos = hoja.getRange("A2:B29").getValues();
+
+  const config = {};
+
+  datos.forEach(function(fila) {
+    const clave = fila[0];
+    const valor = fila[1];
+    if (clave) {
+      config[String(clave).trim()] = String(valor).trim();
+    }
+  });
+
+  return config;
+}
+*/
+
+
+/***************************************************************
+ *
+ * 🔐 BLOQUE ÚNICO DE CONFIGURACIÓN
+ * SOLO EDITAR AQUÍ CUANDO CAMBIE DE CUENTA
+ *
+ ***************************************************************/
+/*const CONFIG = {
+
+  // 📁 Carpetas Drive
+  CARPETA_RAIZ: "1V7KpeFA6kB4tpyj02SQkZe6x-NShX_0i",
+  CARPETA_FIRMAS: "1-xxezbuhuVO-38GZAofsBzAcLDgqYixq",
+
+  // 📄 Plantillas Google Docs
+  PLANTILLA_1: "1FjMMuM4z-ayVNni4tIKwCegC-ts5RCqxX4fEhjzeukY",
+  PLANTILLA_2: "1bqqKxXkvkVLtpQL6CIx2x757BpGL6NzrZqaPGeDBxls",
+
+  // 📊 Planilla GFPI
+  PLANILLA_GFPI: "1Qs_wmKAVJPIu4saYEiuniwgVbBMJJ0MoutP816MCjcs",
+
+  // 🔗 Links externos
+  LINK_FIRMADOR: "https://www.ilovepdf.com/es/firmar-pdf",
+  LINK_CARGUE: "https://forms.gle/LiyDbY23qZJbfyBr6"
+
+};
+*/
+/**
+ * =====================================================
+ * FUNCIÓN PRINCIPAL
+ * Trigger: Al enviar formulario
+ * Flujo: Forms → Sheets → Docs → PDF → Email
+ * =====================================================
+ */
+function formSENA(e) {
+
+  const CONFIG = cargarConfig_();
+
+  if (!CONFIG.CARPETA_RAIZ) throw new Error("CONFIG: Falta CARPETA_RAIZ");
+if (!CONFIG.PLANTILLA_1) throw new Error("CONFIG: Falta PLANTILLA_1");
+if (!CONFIG.PLANTILLA_2) throw new Error("CONFIG: Falta PLANTILLA_2");
+if (!CONFIG.CARPETA_FIRMAS) throw new Error("CONFIG: Falta CARPETA_FIRMAS");
+if (!CONFIG.PLANILLA_GFPI) throw new Error("CONFIG: Falta PLANILLA_GFPI");
+if (!CONFIG.LINK_FIRMADOR) throw new Error("CONFIG: Falta LINK_FIRMADOR");
+if (!CONFIG.LINK_CARGUE) throw new Error("CONFIG: Falta LINK_CARGUE");
+
+
+
+  /* =====================================================
+   * 1. LECTURA DE DATOS DEL FORMULARIO (TEXTO)
+   *    Se mantiene e.values[] tal como solicitaste
+   * ===================================================== */
+
+  var primerNombA = e.values[1];
+  var primerApellA = e.values[2];
+  var segundoApellA = e.values[3];
+  var fecha = e.values[4];
+  var sex = e.values[5];
+  var rh = e.values[6];
+  var tipoDocA = e.values[7];
+  var numDocA = e.values[8];
+  var fechaExpA = e.values[9];
+  var lugarExped = e.values[10];
+  var municNacim = e.values[11];
+  var dptoNacim = e.values[12];
+  var direccion = e.values[13];
+  var barrio = e.values[14];
+  var email = e.values[15];
+  var cel = e.values[16];
+  var dicapac = e.values[17];
+  var discapaCual = e.values[18];
+  var prima = e.values[19];
+  var bachi = e.values[20];
+  var eps = e.values[21];
+  var estadoCiv = e.values[22];
+  var nomPMT = e.values[23];
+  var parentes = e.values[24];
+  var telFamili = e.values[25];
+  var tipoDocPMT = e.values[26];
+  var numDocPMT = e.values[27];
+  var lugarExpedDocPMT = e.values[28];
+  var programForm = e.values[29];
+
+  /* =====================================================
+   * 2. LECTURA CORRECTA DE FIRMAS (ARCHIVOS)
+   *    USAR e.namedValues (NO e.values)
+   * ===================================================== */
+  // (En esta versión, las firmas se buscan en Drive por documento, más abajo)
+
+
+  /* =====================================================
+   * 3. PROCESAMIENTO DE FECHAS Y VARIABLES
+   * ===================================================== */
+
+  var diaA = "";
+var mesA = "";
+var anioA = "";
+
+if (fecha instanceof Date) {
+  
+  diaA = Utilities.formatDate(fecha, Session.getScriptTimeZone(), "dd");
+  var mesNumero = Utilities.formatDate(fecha, Session.getScriptTimeZone(), "MM");
+  anioA = Utilities.formatDate(fecha, Session.getScriptTimeZone(), "yyyy");
+
+  mesA = getNombreMes(mesNumero);
+
+} else {
+
+  var partesFecha = String(fecha || "").split("/");
+  diaA = partesFecha[0] || "";
+  mesA = getNombreMes(partesFecha[1] || "");
+  anioA = partesFecha[2] || "";
+
+}
+
+  var masculino = '', femenino = '', otroGenero = '';
+  if (sex === 'Masculino') masculino = 'X';
+  else if (sex === 'Femenino') femenino = 'X';
+  else if (sex === 'Otro') otroGenero = 'X';
+
+  var ti = '', cc = '', ce = '';
+  if (tipoDocA === 'Tarjeta de Identidad') ti = 'X';
+  else if (tipoDocA === 'Cédula de Ciudadanía') cc = 'X';
+  else if (tipoDocA === 'Cédula de Extranjería') ce = 'X';
+
+  /*================================
+   * nuevo codigo nombramiento
+   *=================================*/
+  var tipoDocCorto = "";
+
+  if (tipoDocA === 'Tarjeta de Identidad') tipoDocCorto = "TI";
+  else if (tipoDocA === 'Cédula de Ciudadanía') tipoDocCorto = "CC";
+  else if (tipoDocA === 'Permiso por Protección Temporal') tipoDocCorto = "PPT";
+  else tipoDocCorto = "PPT";
+
+  var partesFechaEx = String(fechaExpA || "").split("/");
+  var diaExpA = partesFechaEx[0] || "";
+  var mesExpA = getNombreMes(partesFechaEx[1] || "");
+  var anioExpA = partesFechaEx[2] || "";
+
+  var dS = '', dN = '';
+  if (dicapac === 'Sí') dS = 'X';
+  else if (dicapac === 'No') dN = 'X';
+
+
+  /* =====================================================
+   * 4. CREAR DOCUMENTO DESDE PLANTILLA
+   * ===================================================== */
+
+  // Carpeta raíz principal (donde quedan las carpetas de estudiantes)
+var carpetaRaiz = DriveApp.getFolderById(CONFIG.CARPETA_RAIZ);
+
+
+// Carpeta única ARCHIVOS_MASTER dentro de la raíz (aquí van DOC/PDF generados)
+var carpetaMaster = obtenerOCrearSubcarpeta_(carpetaRaiz, "ARCHIVOS_MASTER");
+
+
+
+
+  /* =====================================================
+   * 4.1 SUBCARPETA PARA ADJUNTOS DEL FORM (PDFs)
+   * ===================================================== */
+
+  // Generar nombre base estudiante (subcarpeta)
+  var nombreBaseEstudiante = generarNombreBaseEstudiante_(
+    tipoDocCorto,
+    numDocA,
+    primerApellA,
+    segundoApellA,
+    primerNombA
+  );
+
+  // Crear / obtener subcarpeta (aquí NO puede fallar porque carpetaSalida ya existe)
+  var carpetaEstudiante = obtenerOCrearSubcarpeta_(
+  carpetaRaiz,
+  nombreBaseEstudiante
+);
+
+  // 1. Documento de Identidad
+  guardarAdjuntoEnCarpeta_(
+    e,
+    "Documento de identidad",
+    carpetaEstudiante,
+    "1_" + tipoDocCorto + "_" + numDocA + "_Documento de Identidad"  );
+  /*
+guardarAdjuntoEnCarpeta_(
+    e,
+    "Documento de identidad",
+    carpetaEstudiante,
+    "1_" + tipoDocCorto + "_" + numDocA + "_Documento de Identidad_" + nombreBaseEstudiante
+  );
+  */
+
+  // 4. Documento Identificación Acudiente
+  guardarAdjuntoEnCarpeta_(
+    e,
+    "Documento identificación acudiente",
+    carpetaEstudiante,
+    "4_" + tipoDocCorto + "_" + numDocA + "_Documento de identificación Acudiente"
+  );
+
+  // 5. Certificación EPS
+  guardarAdjuntoEnCarpeta_(
+    e,
+    "Certificación EPS Aspirante desde el ADRES",//mismo nombre de la carpeta generada en Drive
+    carpetaEstudiante,
+    "5_" + tipoDocCorto + "_" + numDocA + "_CERTIFICACIÓN EPS"
+  );
+
+// 6. Registro Civil
+  guardarAdjuntoEnCarpeta_(
+    e,
+    "REGISTRO CIVIL ASPIRANTE",
+    carpetaEstudiante,
+    "6_" + tipoDocCorto + "_" + numDocA + "_Registro Civil"
+  );
+
+  // 7. DOCUMENTO DE CUSTODIA
+  guardarAdjuntoEnCarpeta_(
+    e,
+    "DOCUMENTO DE CUSTODIA",
+    carpetaEstudiante,
+    "7_" + tipoDocCorto + "_" + numDocA + "_DOCUMENTO DE CUSTODIA_"
+  );
+
+  /* =====================================================
+   * 4.2 PLANTILLAS (2 DOCS o MÁS)
+   * ===================================================== */
+
+  var plantillas = [
+    { id: CONFIG.PLANTILLA_1, nombre: "2_Compromiso del Aprendiz y Ficha de Matricula 2026" },
+    { id: CONFIG.PLANTILLA_2, nombre: "3_Autorización de Datos menor de edad" }
+  ];
+
+  // Adjuntos del correo (aquí guardaremos TODOS los PDFs generados + firmas)
+  var attachments = [];
+
+  // Generar documentos desde TODAS las plantillas
+  plantillas.forEach(function (p) {
+
+    var plantilla = DriveApp.getFileById(p.id);
+
+    // Nombre del archivo según tu regla
+    var nombreArchivo = "";
+
+    if (p.nombre.indexOf("2_") === 0) {
+      // 2_TipoDoc_NumDoc_Compromiso del Aprendiz_Apellidos_Nombres
+      nombreArchivo =
+        "2_" +
+        tipoDocCorto + "_" +
+        numDocA + "_" +
+        "Compromiso del Aprendiz_" +
+        construirApellidos_(primerApellA, segundoApellA) + "_" +
+        normalizarNombre_(primerNombA);
+    }
+    else if (p.nombre.indexOf("3_") === 0) {
+      // 3_TipoDoc_NumDoc_Autorización de Datos menor de edad_Apellidos_Nombres
+      nombreArchivo =
+        "3_" +
+        tipoDocCorto + "_" +
+        numDocA + "_" +
+        "Autorización de Datos menor de edad_" +
+        construirApellidos_(primerApellA, segundoApellA) + "_" +
+        normalizarNombre_(primerNombA);
+    }
+    else {
+      // Fallback por si agregas más plantillas después
+      nombreArchivo =
+        normalizarNombre_(p.nombre) + "_" +
+        tipoDocCorto + "_" + numDocA + "_" +
+        construirApellidos_(primerApellA, segundoApellA) + "_" +
+        normalizarNombre_(primerNombA);
+    }
+
+    // Copiar plantilla
+    var copy = plantilla.makeCopy(nombreArchivo, carpetaMaster);
+
+
+    var doc = DocumentApp.openById(copy.getId());
+    var body = doc.getBody();
+
+    /* =====================================================
+     * 5. REEMPLAZO DE MARCADORES DE TEXTO
+     * ===================================================== */
+
+    body.replaceText("{{PnombreA}}", primerNombA);
+    body.replaceText("{{PapellidoA}}", primerApellA);
+    body.replaceText("{{SapellidoA}}", segundoApellA);
+    body.replaceText("{{dia}}", diaA);
+    body.replaceText("{{mes}}", mesA);
+    body.replaceText("{{anio}}", anioA);
+    body.replaceText("{{M}}", masculino);
+    body.replaceText("{{F}}", femenino);
+    body.replaceText("{{OtroGenero}}", otroGenero);
+    body.replaceText("{{Rh}}", rh);
+    body.replaceText("{{TipoDocA}}", tipoDocA);
+    body.replaceText("{{TI}}", ti);
+    body.replaceText("{{CC}}", cc);
+    body.replaceText("{{CE}}", ce);
+    body.replaceText("{{NumDocA}}", numDocA);
+    body.replaceText("{{diaExpe}}", diaExpA);
+    body.replaceText("{{mesExpe}}", mesExpA);
+    body.replaceText("{{anoExpe}}", anioExpA);
+    body.replaceText("{{LEDocA}}", lugarExped);
+    body.replaceText("{{MuniNaciA}}", municNacim);
+    body.replaceText("{{DpNacA}}", dptoNacim);
+    body.replaceText("{{Direc}}", direccion);
+    body.replaceText("{{Barrio}}", barrio);
+    body.replaceText("{{Email}}", email);
+    body.replaceText("{{Cel}}", cel);
+    body.replaceText("{{DiscaS}}", dS);
+    body.replaceText("{{DiscaN}}", dN);
+    body.replaceText("{{DiscaCual}}", discapaCual);
+    body.replaceText("{{Prima}}", prima);
+    body.replaceText("{{Bachill}}", bachi);
+    body.replaceText("{{EPSCual}}", eps);
+    body.replaceText("{{EstCvA}}", estadoCiv);
+    //body.replaceText("{{NomFam}}", nombFamili);
+    body.replaceText("{{TelFam}}", telFamili);
+    body.replaceText("{{Parent}}", parentes);
+    body.replaceText("{{MPTNom}}", nomPMT);
+    body.replaceText("{{tipoDoc}}", tipoDocPMT);
+    body.replaceText("{{MPTDoc}}", numDocPMT);
+    body.replaceText("{{lugarExpe}}", lugarExpedDocPMT);
+    body.replaceText("{{PForm}}", programForm);
+
+    /* =====================================================
+     * 6. INSERCIÓN DE FIRMAS (IMÁGENES PNG)
+     * ===================================================== */
+    // (En tu flujo actual, NO insertamos firmas en el Doc.
+    //  Solo las adjuntamos al correo más abajo.)
+
+
+    /* =====================================================
+     * 7. GUARDAR Y EXPORTAR A PDF
+     * ===================================================== */
+
+    doc.saveAndClose();
+    Utilities.sleep(1500);
+
+    var pdfBlob = DriveApp
+      .getFileById(copy.getId())
+      .getAs("application/pdf")
+      .setName(copy.getName() + ".pdf");
+
+    // Guardar PDF en la carpeta
+    carpetaMaster.createFile(pdfBlob);
+
+
+    // Adjuntar PDF al correo
+    attachments.push(pdfBlob);
+
+  }); // <-- FIN forEach plantillas
+
+
+  /* =====================================================
+   * 7.1 ARMAR ADJUNTOS (FIRMAS PNG)
+   * ===================================================== */
+
+  // Buscar ambas firmas por documento (aprendiz y acudiente)
+  var firmas = buscarFirmasEnDrive_(
+    numDocA,      // documento aprendiz
+    numDocPMT     // documento acudiente
+  );
+
+  // Adjuntar firma aprendiz
+  if (firmas.aprendiz) {
+    var nombreAprendiz =
+      "FirmaAprendiz_" +
+      numDocA + "_" +
+      normalizarNombre_(primerApellA) + "_" +
+      normalizarNombre_(primerNombA) + ".png";
+
+    attachments.push(
+      firmas.aprendiz.copyBlob().setName(nombreAprendiz)
+    );
+  }
+
+  // Adjuntar firma acudiente (OJO: aquí va numDocPMT, no numDocA)
+  if (firmas.acudiente) {
+    var nombreAcudiente =
+      "FirmaAcudiente_" +
+      numDocPMT + "_" +
+      normalizarNombre_(primerApellA) + "_" +
+      normalizarNombre_(primerNombA) + ".png";
+
+    attachments.push(
+      firmas.acudiente.copyBlob().setName(nombreAcudiente)
+    );
+  }
+
+//ADAPTACIÓN PARA HOJA DE ASISTENCIA DE FIRMAS
+  actualizarPlanillaAsistencia_(
+  tipoDocCorto,
+  numDocA,
+  primerNombA,
+  primerApellA,
+  segundoApellA,
+  direccion,
+  email,
+  cel
+);
+
+
+
+  /* =====================================================
+   * 8. ENVÍO DE CORREO
+   * ===================================================== */
+
+  var cuerpoCorreo =
+    'Hola, ' + primerNombA + ' ' + primerApellA + ' ' + segundoApellA + '\n\n' +
+    'Apreciado(a) aspirante a aprendiz, a continuación encontrará los archivos adjuntos en PDF y PNG:\n\n' +
+    
+    '✔- FORMATO “MI COMPROMISO COMO APRENDIZ SENA” junto con el FORMATO DE APOYO FR-09 - FICHA DE MATRICULA.\n' +
+    '✔- FORMATO “TRATAMIENTO DE DATOS MENOR DE EDAD”.\n' +
+    '✔- Firma elaborada por ti en imagen PNG”.\n' +
+    '✔- Firma de tu acudiente en imagen PNG.\n\n' +
+    'Realice estos sencillos pasos: ⮕\n\n' +
+    '1- Descargue todos los archivos adjuntos.⬇⬇⬇ \n' +
+    '2- Ingrese al siguiente enlace para realizar la firma electrónica de los formatos PDF adjuntos: ' + CONFIG.LINK_FIRMADOR + ' \n' +
+    '3- Una vez firmados los documentos y posteriormente descargados, carguelos al siguiente enlace: ' + CONFIG.LINK_CARGUE + ' \n\n' +
+    'TE COMPARTIMOS UN VÍDEO DE APOYO PARA QUE SIGAS LOS PASOS: \n\n'+
+    CONFIG.LINK_VIDEO_APOYO + '\n\n' +
+    'Por último debes estar pendiente a cualquier comunicación por parte del SENA por si surgen observaciones en los documentos cargados en la plataforma. \n\n'+
+    'Te esperan nuevas experiencias SENA que transformarán tu vida!';
+
+  GmailApp.sendEmail(
+    email,
+    "Formulario Aspirante Aprendiz SENA CBI",
+    cuerpoCorreo,
+    { attachments: attachments }
+  );
+}
+
+
+/* =====================================================
+ * UTILIDAD: MES NUMÉRICO → TEXTO
+ * ===================================================== */
+function getNombreMes(n) {
+
+  const numero = parseInt(n, 10);
+
+  const meses = {
+    1: "enero",
+    2: "febrero",
+    3: "marzo",
+    4: "abril",
+    5: "mayo",
+    6: "junio",
+    7: "julio",
+    8: "agosto",
+    9: "septiembre",
+    10: "octubre",
+    11: "noviembre",
+    12: "diciembre"
+  };
+
+  return meses[numero] || "";
+}
+
+
+/* =====================================================
+ * BUSCAR FIRMAS PNG EN DRIVE (PARA ADJUNTAR)
+ * ===================================================== */
+function buscarFirmasEnDrive_(docAprendiz, docAcudiente) {
+  const CONFIG = cargarConfig_();
+
+
+  const carpetaFirmas = DriveApp.getFolderById(CONFIG.CARPETA_FIRMAS);
+
+  const archivos = carpetaFirmas.getFilesByType(MimeType.PNG);
+
+  var firmaAprendiz = null;
+  var firmaAcudiente = null;
+
+  var dA = String(docAprendiz || "").trim();
+  var dC = String(docAcudiente || "").trim();
+
+  while (archivos.hasNext()) {
+
+    const archivo = archivos.next();
+    const nombre = archivo.getName().toUpperCase();
+
+    // Buscar firma del aprendiz por su documento
+    if (dA && nombre.indexOf(dA) !== -1 && nombre.indexOf("APRENDIZ") !== -1) {
+      firmaAprendiz = archivo.getBlob();
+    }
+
+    // Buscar firma del acudiente por su documento
+    if (dC && nombre.indexOf(dC) !== -1 && nombre.indexOf("ACUDIENTE") !== -1) {
+      firmaAcudiente = archivo.getBlob();
+    }
+  }
+
+  return {
+    aprendiz: firmaAprendiz,
+    acudiente: firmaAcudiente
+  };
+}
+
+
+/**
+ * Normaliza texto para comparar (mayúsculas, sin acentos, espacios a _)
+ */
+function normalizarNombre_(s) {
+  return String(s || "")
+    .toUpperCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // quita acentos
+    .replace(/\s+/g, "_");
+}
+
+
+/**
+ * Construye apellidos (uno o dos) ya normalizados y unidos por _
+ */
+function construirApellidos_(apellido1, apellido2) {
+  var a1 = normalizarNombre_(apellido1);
+  var a2 = normalizarNombre_(apellido2);
+  if (a2 && a2.trim() !== "") return a1 + "_" + a2;
+  return a1;
+}
+
+
+function generarNombreBaseEstudiante_(tipoDocCorto, numDoc, apellido1, apellido2, nombres) {
+
+  var apellidos = apellido1;
+  if (apellido2 && apellido2.trim() !== "") {
+    apellidos += "_" + apellido2;
+  }
+
+  return (
+    tipoDocCorto + "_" +
+    numDoc + "_" +
+    normalizarNombre_(apellidos) + "_" +
+    normalizarNombre_(nombres)
+  );
+}
+
+
+function obtenerOCrearSubcarpeta_(parentFolder, nombreSubcarpeta) {
+
+  var folders = parentFolder.getFoldersByName(nombreSubcarpeta);
+
+  if (folders.hasNext()) {
+    return folders.next();
+  }
+
+  return parentFolder.createFolder(nombreSubcarpeta);
+}
+
+
+function guardarAdjuntoEnCarpeta_(e, nombrePregunta, carpetaDestino, nuevoNombre) {
+
+  if (!e.namedValues || !e.namedValues[nombrePregunta]) return;
+
+  // En Forms puede venir ID o URL. Tomamos el primer valor.
+  var raw = e.namedValues[nombrePregunta][0];
+  if (!raw) return;
+
+  // Extraer ID de Drive de forma robusta
+  var match = String(raw).match(/[-\w]{25,}/);
+  if (!match) return;
+
+  var fileId = match[0];
+  var archivoOriginal = DriveApp.getFileById(fileId);
+
+  archivoOriginal.makeCopy(
+    nuevoNombre + ".pdf",
+    carpetaDestino
+  );
+}
+
+
+/***************************************************************
+ * ACTUALIZAR PLANILLA GFPI ASISTENCIA
+ ***************************************************************/
+function actualizarPlanillaAsistencia_(
+  tipoDoc,
+  numeroDoc,
+  nombres,
+  apellido1,
+  apellido2,
+  direccion,
+  correo,
+  telefono
+) {
+
+  const CONFIG = cargarConfig_();
+
+  if (!CONFIG.PLANILLA_GFPI) {
+    throw new Error("CONFIG: Falta PLANILLA_GFPI");
+  }
+
+  const ss = SpreadsheetApp.openById(CONFIG.PLANILLA_GFPI);
+
+  const hojas = ["asistencia_mod1", "asistencia_mod2"];
+
+  for (let i = 0; i < hojas.length; i++) {
+
+    const hoja = ss.getSheetByName(hojas[i]);
+    if (!hoja) continue;
+
+    const resultado = escribirEnHoja_(
+      hoja,
+      tipoDoc,
+      numeroDoc,
+      nombres,
+      apellido1,
+      apellido2,
+      direccion,
+      correo,
+      telefono
+    );
+
+    if (resultado === "OK") return;
+  }
+
+  throw new Error("Las hojas de asistencia están llenas.");
+}
+
+
+
+
+/***************************************************************
+ * ESCRIBE O SOBRESCRIBE EN RANGO B11:K30
+ ***************************************************************/
+function escribirEnHoja_(
+  hoja,
+  tipoDoc,
+  numeroDoc,
+  nombres,
+  apellido1,
+  apellido2,
+  direccion,
+  correo,
+  telefono
+) {
+
+  const FILA_INICIO = 11;
+  const FILA_FIN = 30;
+
+  const datos = hoja.getRange("B11:K30").getValues();
+
+  let filaLibre = null;
+
+  for (let i = 0; i < datos.length; i++) {
+
+    const fila = datos[i];
+
+    const docExistente = String(fila[1] || "").trim();     // Col C
+    const apellidoExistente = String(fila[4] || "").trim(); // Col F
+
+    // 🔁 Si ya existe mismo documento + primer apellido → sobrescribir
+    if (
+      docExistente === String(numeroDoc).trim() &&
+      apellidoExistente.toUpperCase() === String(apellido1).toUpperCase()
+    ) {
+
+      escribirFila_(
+        hoja,
+        FILA_INICIO + i,
+        tipoDoc,
+        numeroDoc,
+        nombres,
+        apellido1,
+        apellido2,
+        direccion,
+        correo,
+        telefono
+      );
+
+      return "OK";
+    }
+
+    // 📌 Detectar fila libre (col C vacía)
+    if (!docExistente && filaLibre === null) {
+      filaLibre = FILA_INICIO + i;
+    }
+  }
+
+  // 🆕 Si no existe pero hay fila libre
+  if (filaLibre !== null) {
+
+    escribirFila_(
+      hoja,
+      filaLibre,
+      tipoDoc,
+      numeroDoc,
+      nombres,
+      apellido1,
+      apellido2,
+      direccion,
+      correo,
+      telefono
+    );
+
+     //  Insertar firma PNG en columna L/M
+  insertarFirmaEnCelda_(
+  hoja,
+  filaLibre,
+  apellido1,
+  apellido2,
+  nombres,
+  numeroDoc
+);
+
+
+    return "OK";
+  }
+
+  return "FULL";
+}
+
+
+
+
+/***************************************************************
+ * ESCRIBE DATOS EN UNA FILA ESPECÍFICA
+ ***************************************************************/
+/*function escribirFila_(
+  hoja,
+  fila,
+  tipoDoc,
+  numeroDoc,
+  nombres,
+  apellido1,
+  apellido2,
+  direccion,
+  correo,
+  telefono
+) {
+
+  hoja.getRange("B" + fila).setValue(tipoDoc);
+  hoja.getRange("C" + fila).setValue(numeroDoc);
+  hoja.getRange("D" + fila).setValue(nombres);
+  hoja.getRange("F" + fila).setValue(apellido1 + " " + apellido2);
+  hoja.getRange("H" + fila).setValue(direccion);
+  hoja.getRange("I" + fila).setValue(correo);
+  hoja.getRange("K" + fila).setValue(telefono);
+}
+*/
+
+function escribirFila_(
+  hoja,
+  fila,
+  tipoDoc,
+  numeroDoc,
+  nombres,
+  apellido1,
+  apellido2,
+  direccion,
+  correo,
+  telefono
+) {
+
+  hoja.getRange("B" + fila).setValue(tipoDoc);
+  hoja.getRange("C" + fila).setValue(numeroDoc);
+  hoja.getRange("D" + fila).setValue(nombres);
+  hoja.getRange("F" + fila).setValue(apellido1 + " " + apellido2);
+  hoja.getRange("H" + fila).setValue(direccion);
+  hoja.getRange("I" + fila).setValue(correo);
+  hoja.getRange("K" + fila).setValue(telefono);
+
+  //  INSERTAR FIRMA PNG EN COLUMNA L
+
+  insertarFirmaEnCelda_(
+    hoja,
+    fila,
+    numeroDoc,
+    apellido1,
+    apellido2,
+    nombres
+  );
+}
+
+
+/***********************************************************
+ * CONSTRUIR NOMBRE EXACTO DE LA FIRMA
+ ***********************************************************/
+function construirNombreFirma_(apellido1, apellido2, nombres, numeroDoc) {
+
+  var a1 = normalizarNombre_(apellido1);
+  var a2 = normalizarNombre_(apellido2);
+  var nom = normalizarNombre_(nombres);
+  var doc = String(numeroDoc || "").trim();
+
+  // Construir bloque apellidos dinámico
+  var bloqueApellidos = a1;
+  if (a2 && a2 !== "") {
+    bloqueApellidos += "_" + a2;
+  }
+
+  var nombreArchivo =
+    bloqueApellidos + "_" +
+    nom + "_" +
+    doc + "_APRENDIZ.png";
+
+  Logger.log("Nombre final construido: " + nombreArchivo);
+
+  return nombreArchivo;
+}
+
+
+
+
+/***********************************************************
+ * INSERTAR FIRMA PNG EN CELDA L (L/M combinadas)
+ ***********************************************************/
+
+function insertarFirmaEnCelda_(hoja, fila, apellido1, apellido2, nombres, numeroDoc) {
+  const CONFIG = cargarConfig_();
+
+  const carpetaFirmas = DriveApp.getFolderById(CONFIG.CARPETA_FIRMAS);
+
+
+  // ================================
+  // 1️⃣ Normalizar datos EXACTAMENTE
+  // igual que el sistema de firmas
+  // ================================
+
+  var a1 = normalizarNombre_(apellido1);
+  var a2 = normalizarNombre_(apellido2);
+  var nom = normalizarNombre_(nombres);
+  var doc = String(numeroDoc || "").trim();
+
+  // Construir apellidos dinámicamente (sin doble "_")
+  var apellidos = a1;
+  if (a2 && a2 !== "") {
+    apellidos += "_" + a2;
+  }
+
+  // Nombre EXACTO esperado
+  var nombreArchivo =
+    apellidos + "_" +
+    nom + "_" +
+    doc + "_APRENDIZ.png";
+
+  Logger.log("Buscando archivo exacto: " + nombreArchivo);
+
+  // ================================
+  // 2️⃣ Buscar coincidencia exacta
+  // ================================
+
+  var archivos = carpetaFirmas.getFilesByName(nombreArchivo);
+
+  if (archivos.hasNext()) {
+
+    var archivo = archivos.next();
+
+    hoja.insertImage(archivo.getBlob(), 12, fila)
+        .setWidth(110)
+        .setHeight(45);
+
+    Logger.log("Firma encontrada exacta: " + nombreArchivo);
+    return;
+  }
+
+  // ================================
+  // 3️⃣ RESPALDO INTELIGENTE
+  // Buscar solo por documento + APRENDIZ
+  // ================================
+
+  Logger.log("No encontrada exacta. Buscando por documento...");
+
+  var todos = carpetaFirmas.getFiles();
+
+  while (todos.hasNext()) {
+
+    var f = todos.next();
+    var nombre = f.getName();
+
+    if (
+      nombre.includes(doc) &&
+      nombre.includes("APRENDIZ")
+    ) {
+
+      hoja.insertImage(f.getBlob(), 12, fila)
+          .setWidth(110)
+          .setHeight(45);
+
+      Logger.log("Firma encontrada por documento: " + nombre);
+      return;
+    }
+  }
+
+  Logger.log("No se encontró ninguna firma para documento: " + doc);
+}
+
+
+  
+  </textarea>
+
+    
   </main>
 
   <script>
@@ -2655,6 +3702,7 @@ Equipo SENA`;
   </script>
 </body>
 </html>
+
 
 
 
